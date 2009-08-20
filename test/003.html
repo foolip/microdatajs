@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>spec example</title>
+<script src="../microdata.js"></script>
+</head>
+<body>
+<section item="org.example.animal.cat com.example.feline">
+ <h1 itemprop="org.example.name com.example.fn">Hedral</h1>
+ <p itemprop="org.example.desc">Hedral is a male american domestic
+ shorthair, with a fluffy <span
+ itemprop="com.example.color">black</span> fur with <span
+ itemprop="com.example.color">white</span> paws and belly.</p>
+ <img itemprop="org.example.img" src="hedral.jpeg" alt="" title="Hedral, age 18 months">
+</section>
+</body>
+<script>
+var outer = document.createElement('ul');
+for (var item = 0; item < document.items.length; item += 1) {
+  var itemLi = document.createElement('li');
+  var inner = document.createElement('ul');
+  for (var name = 0; name < document.items[item].properties.names.length; name += 1) {
+    var propLi = document.createElement('li');
+    propLi.appendChild(document.createTextNode(document.items[item].properties.names[name]));
+    inner.appendChild(propLi);
+  }
+  itemLi.appendChild(inner);
+  outer.appendChild(itemLi);
+}
+document.body.appendChild(outer);
+</script>
+</html>
