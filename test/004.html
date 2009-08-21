@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>subject attribute</title>
+<script src="../microdata.js"></script>
+</head>
+<body>
+<p>FAIL (script didn't run)</p>
+<div id="a" item>
+  <div id="ab" subject="b" itemprop="org.example.foo">a</div>
+</div>
+<div id="b" item>
+  <div id="ba" subject="c" itemprop="org.example.foo">b</div>
+</div>
+<div id="c" item>
+  <div id="ca" subject="x" itemprop="org.example.foo">c</div>
+</div>
+</body>
+<script>
+var passed = true;
+var props;
+var namedProps;
+
+passed &= document.items.length == 3;
+passed &= document.items[0] == document.getElementById('a');
+passed &= document.items[0].properties.length == 0;
+passed &= document.items[1] == document.getElementById('b');
+passed &= document.items[1].properties.length == 1;
+passed &= document.items[1].properties[0] == document.getElementById('ab');
+passed &= document.items[2] == document.getElementById('c');
+passed &= document.items[2].properties.length == 1;
+passed &= document.items[2].properties[0] == document.getElementById('ba');
+
+document.getElementsByTagName('p')[0].innerHTML = passed ? 'PASS' : 'FAIL';
+</script>
+</html>
