@@ -49,33 +49,12 @@ function testItemValueReflection(tag, attr, str) {
   testStringReflection(elm, attr, 'itemValue', str);
 }
 
-function testTextContentReflection(tag, prop, str) {
-  var elm = document.createElement(tag);
-
-  equals(typeof elm[prop], 'string', 'typeof .'+prop);
-
-  // reflect content attribute -> DOM property
-  equals(elm[prop], '', 'no @'+attr);
-  elm.setAttribute(attr, str);
-  equals(elm[prop], str, 'setting @'+attr);
-  elm.removeAttribute(attr);
-  equals(elm[prop], '', 'removing @'+attr);
-
-  // reflect DOM property -> content attribute
-  elm[prop] = '';
-  equals(elm.getAttribute(attr), '', 'setting .'+prop+'=""');
-  elm[prop] = str;
-  equals(elm.getAttribute(attr), str, 'setting .'+prop+'="'+str+'"');
-  //delete elm[prop];
-  //ok(!elm.hasAttribute(attr), 'deleting .'+prop);
-}
-
 test(".itemScope reflects @itemscope", function() {
   testBoolReflection('span', 'itemscope', 'itemScope');
 });
 
 test(".itemType reflects @itemtype", function() {
-  testStringReflection('span', 'itemtype', 'itemType', 'se.mantic.banana');
+  testStringReflection('span', 'itemtype', 'itemType', 'http://example.com/vocab#thing');
 });
 
 test(".itemId reflects @itemid", function() {
@@ -83,7 +62,11 @@ test(".itemId reflects @itemid", function() {
 });
 
 test(".itemProp reflects @itemprop", function() {
-  testStringReflection('span', 'itemprop', 'itemProp', 'Semantic Banana');
+  testStringReflection('span', 'itemprop', 'itemProp', 'Semantic Thing');
+});
+
+test(".itemRef reflects @itemref", function() {
+  testStringReflection('span', 'itemref', 'itemRef', 'id1 id2');
 });
 
 test(".itemValue without @itemprop", function() {
@@ -105,7 +88,7 @@ test(".itemValue with @itemprop and @itemscope", function() {
 });
 
 test("meta .itemValue reflects @content", function() {
-  testItemValueReflection('meta', 'content', 'Semantic Banana');
+  testItemValueReflection('meta', 'content', 'Semantic Thing');
 });
 
 test("audio .itemValue reflects @src", function() {
@@ -156,29 +139,30 @@ test("div .itemValue acts as .textContent", function() {
   var elm = document.createElement('div');
   elm.setAttribute('itemprop', '');
   equals(elm.itemValue, '', 'no child nodes');
-  elm.appendChild(document.createTextNode('Semantic Banana'));
-  equals(elm.itemValue, 'Semantic Banana', 'text node');
+  elm.appendChild(document.createTextNode('Semantic Thing'));
+  equals(elm.itemValue, 'Semantic Thing', 'text node');
   var b = document.createElement('b');
   b.appendChild(document.createTextNode(' 2'));
   elm.appendChild(b);
-  equals(elm.itemValue, 'Semantic Banana 2', 'text node + element node');
-  elm.itemValue = 'Banana Semantic';
+  equals(elm.itemValue, 'Semantic Thing 2', 'text node + element node');
+  elm.itemValue = 'Thing Semantic';
   equals(elm.childNodes.length, 1, 'setting .itemValue');
-  equals(elm.firstChild.nodeValue, 'Banana Semantic', 'setting .itemValue');
+  equals(elm.firstChild.nodeValue, 'Thing Semantic', 'setting .itemValue');
 });
 
 function verifyItems(actual, expected, message) {
   equals(actual.length, expected.length, message+'.length');
   for (var i=0; i < actual.length && i < expected.length; i++) {
     equals(actual.item(i), expected[i], message+'.item('+i+')');
-    equals(actual(i), expected[i], message+'('+i+')');
+    //equals(actual(i), expected[i], message+'('+i+')');
     equals(actual[i], expected[i], message+'['+i+']');
   }
 }
 
 test("document.getItems()", function() {
   var items = document.getItems();
-  ok(items instanceof NodeList, "returns NodeList");
+
+  //ok(items instanceof NodeList, "returns NodeList");
   verifyItems(items, [], "items");
 
   // add an item
@@ -299,10 +283,10 @@ test("HTMLElement.properties", function() {
 
   var props = item.properties;
   equals(typeof props, 'object', '.properties is an object');
-  ok(props instanceof HTMLPropertyCollection, '.properties instanceof HTMLPropertyCollection');
+  //ok(props instanceof HTMLPropertiesCollection, '.properties instanceof HTMLPropertiesCollection');
   equals(typeof props.length, 'number', '.properties.length is a number');
   equals(typeof props.names, 'object', '.properties.names is an object');
-  //ok(props instanceof DOMStringList, '.properties.names instanceof HTMLPropertyCollection');
+  //ok(props instanceof DOMStringList, '.properties.names instanceof DOMStringList');
   equals(typeof props.item, 'function', '.properties.item is a function');
   equals(typeof props.namedItem, 'function', '.properties.namedItem is a function');
 

@@ -1,5 +1,30 @@
+// emulate Object.defineProperty
+if (!Object.defineProperty && document.__defineGetter__) {
+    Object.defineProperty = function(obj, prop, desc) {
+	if (desc.get)
+	    obj.__defineGetter__(prop, desc.get);
+	if (desc.set)
+	    obj.__defineSetter__(prop, desc.set);
+    };
+}
+
+// emulate Element.textContent
+if (typeof document.documentElement.textContent == 'undefined') {
+    Object.defineProperty(Element.prototype, 'textContent',
+	{
+	    get: function() {
+		return this.innerText;
+	    },
+	    set: function(val) {
+		this.innerText = val;
+	    }
+	});
+}
+
+// utility functions
+
 function splitTypes(s) {
-    if (s) return s.split(/\s+/);
+    if (s && /\S/.test(s)) return s.split(/\s+/);
     return [];
 }
 
@@ -11,26 +36,44 @@ function inList(item, list) {
     return false;
 }
 
-function isSubset(sub, sup) {
-    for (var i = 0; i < sub.length; i++) {
-	if (!inList(sub[i], sup))
-	    return false;
-    }
-    return true;
-}
-
-function getElementsByFilter(pred) {
+function fakeCollection(rootElem, incFilter, recFilter) {
     var elems = [];
-    function filterNode(elem) {
-	if (pred(elem))
-	    elems.push(elem);
-	for (var child = elem.firstChild; child; child = child.nextSibling) {
-	    if (child.nodeType == 1) {
-		filterNode(child);
+    elems.item = function(idx){return this[idx];};
+
+    function update(_incFilter, _recFilter) {
+	while (elems.length)
+	    elems.pop();
+	function pushElements(elem) {
+	    if (_incFilter(elem))
+		elems.push(elem);
+	    if (!_recFilter || _recFilter(elem)) {
+		for (var child = elem.firstChild; child; child = child.nextSibling) {
+		    if (child.nodeType == 1) {
+			pushElements(child);
+		    }
+		}
 	    }
 	}
+	pushElements(rootElem);
     }
-    filterNode(document.documentElement);
+
+    function updateSimple() {
+	update(incFilter, recFilter);
+    }
+
+    // keep collection up to date if possible
+    if (rootElem.addEventListener) {
+	rootElem.addEventListener('DOMAttrModified', updateSimple, false);
+	rootElem.addEventListener('DOMNodeInserted', updateSimple, false);
+	rootElem.addEventListener('DOMNodeRemoved',
+	    function(ev) {
+		update(function(e){return e != ev.target && incFilter(e);},
+		       function(e){return e != ev.target;});
+	    }, false);
+    }
+
+    updateSimple();
+
     return elems;
 }
 
@@ -51,98 +94,101 @@ function filter(list, pred) {
     return ret;
 }
 
-function filterItems(correspondingItem) {
-    return filter(itemNodes, function (x) {
-		      return getCorrespondingItem(x) == correspondingItem;
-		  });
+// Element attribute<->property reflection
+
+function reflectBoolean(attr, prop) {
+    Object.defineProperty(Element.prototype, prop,
+	{ get: function () { return this.hasAttribute(attr); },
+	  set: function (val) { if (val) this.setAttribute(attr, attr);
+				else this.removeAttribute(attr); } });
 }
 
-Element.prototype.__defineGetter__('item', function () { return this.getAttribute('item'); });
+function reflectString(attr, prop) {
+    Object.defineProperty(Element.prototype, prop,
+	{ get: function () { return this.getAttribute(attr) || ""; },
+	  set: function (val) { this.setAttribute(attr, val); }});
+}
 
-Element.prototype.__defineGetter__('itemprop', function () { return this.getAttribute('itemprop'); });
+reflectBoolean('itemscope', 'itemScope');
+reflectString('itemtype', 'itemType');
+reflectString('itemid', 'itemId');
+reflectString('itemprop', 'itemProp');
+reflectString('itemref', 'itemRef');
 
-Element.prototype.__defineGetter__("properties",
+function getItemValueProperty(e) {
+    if (e.tagName == 'META')
+	return 'content';
+    if (e.tagName == 'AUDIO' || e.tagName == 'EMBED' ||
+	e.tagName == 'IFRAME' || e.tagName == 'IMG' ||
+	e.tagName == 'SOURCE' || e.tagName == 'VIDEO')
+	return 'src';
+    if (e.tagName == 'A' || e.tagName == 'AREA' || e.tagName == 'LINK')
+	return 'href';
+    if (e.tagName == 'OBJECT')
+	return 'data';
+    if (e.tagName == 'TIME' && e.hasAttribute('datetime'))
+	return 'datetime';
+    return 'textContent';
+}
+
+Object.defineProperty(Element.prototype, 'itemValue',
+{
+    get: function() {
+	if (!this.hasAttribute('itemprop'))
+	    return null;
+	if (this.hasAttribute('itemscope'))
+	    return this;
+	return this[getItemValueProperty(this)];
+    },
+    set: function(val) {
+	if (!this.hasAttribute('itemprop') || this.hasAttribute('itemscope'))
+	    throw new Error('INVALID_ACCESS_ERR');
+	this[getItemValueProperty(this)] = val;
+    }
+});
+
+// Element.properties
+
+Object.defineProperty(Element.prototype, 'properties', { get:
 function() {
-    // If the element has an item attribute, returns an
-    // HTMLPropertyCollection object with all the element's
-    // properties.
-    var elems;
-    if (this.hasAttribute('item')) {
-	var itemelem = this; /* this in inline function is window */
-	elems = getElementsByFilter(function(e){return e.hasAttribute('itemprop') &&
-						splitTypes(e.getAttribute('itemprop')).length &&
-						getCorrespondingItem(e) == itemelem;});
-    } else {
-	// Otherwise, an empty HTMLPropertyCollection object.
-	elems = [];
+    function hasProperty(e) {
+	return e.hasAttribute('itemprop') &&
+	    /\S/.test(e.getAttribute('itemprop'));
     }
 
-    elems.names = [];
-    for (var i = 0; i < elems.length; i++) {
-	var elemNames = splitTypes(elems[i].getAttribute('itemprop'));
-	for (var j = 0; j < elemNames.length; j++) {
-	    if (!inList(elemNames[j], elems.names))
-		elems.names.push(elemNames[j]);
+    var props = fakeCollection(this, hasProperty);
+
+    props.names = [];
+    for (var i = 0; i < props.length; i++) {
+	var propNames = splitTypes(props[i].getAttribute('itemprop'));
+	for (var j = 0; j < propNames.length; j++) {
+	    if (!inList(propNames[j], props.names))
+		props.names.push(propNames[j]);
 	}
     }
 
-    elems.item = function(idx){try{return this[idx];}catch(x){return null;}};
-
-    elems.namedItem = function (name) {
+    // FIXME: should be live
+    props.namedItem = function (name) {
 	var namedElems = filter(elems, function(e){return inList(name, splitTypes(e.getAttribute('itemprop')));});
 	namedElems.item = function(idx){return this[idx];};
 	namedElems.contents = map(namedElems, function(e){return e.content;});
 	return namedElems;
     };
 
-    return elems;
-});
+    return props;
+}});
 
-Element.prototype.__defineGetter__("content",
-function() {
-    if (this.tagName == 'META')
-	return this.getAttribute('content');
-    if (this.tagName == 'AUDIO' || this.tagName == 'EMBED' ||
-	this.tagName == 'IFRAME' || this.tagName == 'IMG' ||
-	this.tagName == 'SOURCE' || this.tagName == 'VIDEO')
-	return this.src;
-    if (this.tagName == 'A' || this.tagName == 'AREA' || this.tagName == 'LINK')
-	return this.href;
-    if (this.tagName == 'OBJECT')
-	return this.data;
-    if (this.tagName == 'TIME' && this.hasAttribute('datetime'))
-	return this.getAttribute('datetime');
-    return this.textContent;
-});
+// document.getItems
 
-Element.prototype.__defineGetter__('subject', function () { return this.getAttribute('subject'); });
-
-function getCorrespondingItem(node) {
-    if (node.hasAttribute('subject'))
-	return document.getElementById(node.getAttribute('subject'));
-    var ancestor = node.parentNode;
-    while (ancestor && ancestor.nodeType == 1) {
-	if (ancestor.hasAttribute('item'))
-	    return ancestor;
-	ancestor = ancestor.parentNode;
-    }
-    return null;
-}
-
-Document.prototype.getItems = function(typeNames) {
-    //var xpr = document.evaluate('//*[@item]', root, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-    //this.length = xpr.snapshotLength;
-    //this.item = function(i) { return xpr.snapshotItem(i); };
-
+document.getItems = function(typeNames) {
     var types = splitTypes(typeNames);
-    var items = getElementsByFilter(function(e){return e.hasAttribute('item') &&
-						isSubset(types, splitTypes(e.getAttribute('item'))) &&
-						getCorrespondingItem(e) == null;});
 
-    items.item = function(idx){return items[idx];};
+    function isTopLevelItem(e) {
+	return e.hasAttribute('itemscope') &&
+	    !e.hasAttribute('itemprop') &&
+	    (types.length == 0 ||
+	     inList(e.getAttribute('itemtype'), types));
+    }
 
-    return items;
+    return fakeCollection(this.documentElement, isTopLevelItem);
 };
-
-// FIXME: not in spec
-Document.prototype.__defineGetter__('items', function () { return this.getItems(); });
