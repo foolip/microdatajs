@@ -23,7 +23,7 @@ if (typeof document.documentElement.textContent == 'undefined') {
 
 // utility functions
 
-function splitTypes(s) {
+function splitTokens(s) {
     if (s && /\S/.test(s)) return s.split(/\s+/);
     return [];
 }
@@ -34,6 +34,13 @@ function inList(item, list) {
 	    return true;
     }
     return false;
+}
+
+// http://ejohn.org/blog/comparing-document-position/
+function contains(a, b){
+    return a.contains ?
+	a != b && a.contains(b) :
+	!!(a.compareDocumentPosition(b) & 16);
 }
 
 function fakeCollection(rootElem, incFilter, recFilter) {
@@ -61,14 +68,26 @@ function fakeCollection(rootElem, incFilter, recFilter) {
 	update(incFilter, recFilter);
     }
 
+    function afterUpdate() {
+	if (typeof elems.__onchange__ == 'function') {
+	    elems.__onchange__();
+	}
+    }
+
+    function updateHandler() {
+	updateSimple();
+	afterUpdate();
+    }
+
     // keep collection up to date if possible
     if (rootElem.addEventListener) {
-	rootElem.addEventListener('DOMAttrModified', updateSimple, false);
-	rootElem.addEventListener('DOMNodeInserted', updateSimple, false);
+	rootElem.addEventListener('DOMAttrModified', updateHandler, false);
+	rootElem.addEventListener('DOMNodeInserted', updateHandler, false);
 	rootElem.addEventListener('DOMNodeRemoved',
 	    function(ev) {
 		update(function(e){return e != ev.target && incFilter(e);},
 		       function(e){return e != ev.target;});
+		afterUpdate();
 	    }, false);
     }
 
@@ -151,37 +170,128 @@ Object.defineProperty(Element.prototype, 'itemValue',
 
 Object.defineProperty(Element.prototype, 'properties', { get:
 function() {
-    function hasProperty(e) {
-	return e.hasAttribute('itemprop') &&
-	    /\S/.test(e.getAttribute('itemprop'));
-    }
+    // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#the-properties-of-an-item
+    var itemElem = this;
 
-    var props = fakeCollection(this, hasProperty);
+    var props = [];
+    function updateProperties() {
+	var root = itemElem;
+	var pending = [];
+	function pushChildren(e) {
+	    for (var child = e.lastChild; child; child = child.previousSibling) {
+		if (child.nodeType == 1) {
+		    pending.push(child);
+		}
+	    }
+	}
+	pushChildren(root);
 
-    props.names = [];
-    for (var i = 0; i < props.length; i++) {
-	var propNames = splitTypes(props[i].getAttribute('itemprop'));
-	for (var j = 0; j < propNames.length; j++) {
-	    if (!inList(propNames[j], props.names))
-		props.names.push(propNames[j]);
+	props.length = 0;
+
+	function getScopeNode(e) {
+	    var scope = e.parentNode;
+	    while (scope && !scope.itemScope)
+		scope = scope.parentNode;
+	    return scope;
+	}
+	var refIds = splitTokens(root.itemRef);
+	idloop: for (var i=0; i<refIds.length; i++) {
+	    var candidate = document.getElementById(refIds[i]);
+	    if (!candidate) continue;
+	    var scope = getScopeNode(candidate);
+	    for (var j=0; j<pending.length; j++) {
+		if (candidate == pending[j])
+		    continue idloop;
+		if (contains(pending[j], candidate) &&
+		    (pending[j] == scope ||
+		     getScopeNode(pending[j]) == scope))
+		    continue idloop;
+	    }
+	    pending.push(candidate);
+	}
+
+	// from http://www.quirksmode.org/dom/getElementsByTagNames.html
+	pending.sort(function (a,b){return (a.compareDocumentPosition(b)&6)-3;});
+
+	while (pending.length) {
+	    var current = pending.pop();
+	    if (current.hasAttribute('itemprop'))
+		props.push(current);
+	    if (!current.hasAttribute('itemscope'))
+		pushChildren(current);
 	}
     }
 
-    // FIXME: should be live
+    props.names = [];
+    function updateNames() {
+	while (props.names.length)
+	    props.names.pop();
+	for (var i = 0; i < props.length; i++) {
+	    var propNames = splitTokens(props[i].getAttribute('itemprop'));
+	    for (var j = 0; j < propNames.length; j++) {
+		if (!inList(propNames[j], props.names))
+		    props.names.push(propNames[j]);
+	    }
+	}
+    }
+
+    function updatePropertyNodeList(pnl, name) {
+	while (pnl.length)
+	    pnl.pop();
+	while (pnl.values.length)
+	    pnl.values.pop();
+	for (var i=0; i<props.length; i++) {
+	    if (inList(name, splitTokens(props[i].getAttribute('itemprop')))) {
+		pnl.push(props[i]);
+		pnl.values.push(props[i].itemValue);
+	    }
+	}
+    }
+
+    props.item = function(idx){return this[idx];};
+
+    var pnlCache = {};
     props.namedItem = function (name) {
-	var namedElems = filter(elems, function(e){return inList(name, splitTypes(e.getAttribute('itemprop')));});
-	namedElems.item = function(idx){return this[idx];};
-	namedElems.contents = map(namedElems, function(e){return e.content;});
-	return namedElems;
+	if (!pnlCache[name]) {
+	    // fake PropertyNodeList
+	    var pnl = [];
+	    pnl.item = function(idx){return this[idx];};
+	    pnl.values = [];
+	    updatePropertyNodeList(pnl, name);
+	    pnlCache[name] = pnl;
+	}
+	return pnlCache[name];
     };
 
+    function updateHandler() {
+	updateProperties();
+	updateNames();
+	for (name in pnlCache)
+	    updatePropertyNodeList(pnlCache[name], name);
+    }
+
+    // keep collection up to date if possible
+    if (document.documentElement.addEventListener) {
+	document.documentElement.addEventListener('DOMAttrModified', updateHandler, false);
+	document.documentElement.addEventListener('DOMNodeInserted', updateHandler, false);
+	document.documentElement.addEventListener('DOMNodeRemoved', updateHandler, false);
+    }
+
+/*
+	  function(ev) {
+	      update(function(e){return e != ev.target && incFilter(e);},
+		     function(e){return e != ev.target;});
+	  }
+*/
+
+    updateHandler();
     return props;
 }});
 
 // document.getItems
 
 document.getItems = function(typeNames) {
-    var types = splitTypes(typeNames);
+    var types = splitTokens(typeNames);
 
     function isTopLevelItem(e) {
 	return e.hasAttribute('itemscope') &&
