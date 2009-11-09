@@ -174,19 +174,25 @@ function() {
     var itemElem = this;
 
     var props = [];
-    function updateProperties() {
+    function updateProperties(elemFilter) {
 	var root = itemElem;
+
+	props.length = 0;
+
+	// when the root isn't a item in the document, match nothing
+	// FIXME: the spec doesn't actually say this.
+	if (!root.itemScope || !contains(document.documentElement, root))
+	    return;
+
 	var pending = [];
 	function pushChildren(e) {
 	    for (var child = e.lastChild; child; child = child.previousSibling) {
-		if (child.nodeType == 1) {
+		if (child.nodeType == 1 && elemFilter(child)) {
 		    pending.push(child);
 		}
 	    }
 	}
 	pushChildren(root);
-
-	props.length = 0;
 
 	function getScopeNode(e) {
 	    var scope = e.parentNode;
@@ -197,7 +203,8 @@ function() {
 	var refIds = splitTokens(root.itemRef);
 	idloop: for (var i=0; i<refIds.length; i++) {
 	    var candidate = document.getElementById(refIds[i]);
-	    if (!candidate) continue;
+	    if (!candidate || !elemFilter(candidate))
+		continue;
 	    var scope = getScopeNode(candidate);
 	    for (var j=0; j<pending.length; j++) {
 		if (candidate == pending[j])
@@ -263,8 +270,8 @@ function() {
 	return pnlCache[name];
     };
 
-    function updateHandler() {
-	updateProperties();
+    function updateHandler(elemFilter) {
+	updateProperties(function(e){return typeof elemFilter != 'function' || elemFilter(e);});
 	updateNames();
 	for (name in pnlCache)
 	    updatePropertyNodeList(pnlCache[name], name);
@@ -274,15 +281,11 @@ function() {
     if (document.documentElement.addEventListener) {
 	document.documentElement.addEventListener('DOMAttrModified', updateHandler, false);
 	document.documentElement.addEventListener('DOMNodeInserted', updateHandler, false);
-	document.documentElement.addEventListener('DOMNodeRemoved', updateHandler, false);
+	document.documentElement.addEventListener('DOMNodeRemoved',
+	    function(ev) {
+		updateHandler(function(e){return (e != ev.target) && !contains(ev.target, e);});
+	    }, false);
     }
-
-/*
-	  function(ev) {
-	      update(function(e){return e != ev.target && incFilter(e);},
-		     function(e){return e != ev.target;});
-	  }
-*/
 
     updateHandler();
     return props;

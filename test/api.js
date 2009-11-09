@@ -309,29 +309,28 @@ test("HTMLElement.properties", function() {
   verifyNamedItems(propsX, [], [], "propsX");
 
   // item without any properties
-  item.setAttribute('itemscope', '');
+  item.itemScope = true;
   verifyItems(props, [], "props");
   verifyNamedItems(propsA, [], [], "propsA");
   verifyNamedItems(propsB, [], [], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
 
   var prop1 = document.createElement('div');
-  //prop1.id = 'id1';
-  prop1.textContent = 'value1';
-  prop1.setAttribute('itemprop', 'propA');
+  prop1.textContent = 'foo';
+  prop1.itemProp = 'propA';
   item.appendChild(prop1);
   verifyItems(props, [prop1], "props");
-  verifyNamedItems(propsA, [prop1], ['value1'], "propsA");
+  verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
   verifyNamedItems(propsB, [], [], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
 
   // prop2 not descendent of item
   var prop2 = document.createElement('div');
-  prop2.textContent = 'value2';
-  prop2.setAttribute('itemprop', 'propB');
+  prop2.textContent = 'bar';
+  prop2.itemProp = 'propB';
   parent.appendChild(prop2);
   verifyItems(props, [prop1], "props");
-  verifyNamedItems(propsA, [prop1], ['value1'], "propsA");
+  verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
   verifyNamedItems(propsB, [], [], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
 
@@ -339,11 +338,52 @@ test("HTMLElement.properties", function() {
   prop2.id = 'id2';
   item.itemRef = 'id2';
   verifyItems(props, [prop1, prop2], "props");
-  verifyNamedItems(propsA, [prop1], ['value1'], "propsA");
-  verifyNamedItems(propsB, [prop2], ['value2'], "propsB");
+  verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
+  verifyNamedItems(propsB, [prop2], ['bar'], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
 
+  // redundant itemref
+  item.itemRef += ' id2';
+  verifyItems(props, [prop1, prop2], "props");
+  verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
+  verifyNamedItems(propsB, [prop2], ['bar'], "propsB");
+  verifyNamedItems(propsX, [], [], "propsX");
+
+  // nested property in itemref'd tree
+  var prop3 = document.createElement('div');
+  prop3.textContent = 'baz';
+  prop3.id ='id3';
+  prop3.itemProp = 'propC';
+  prop2.appendChild(prop3);
+  item.itemRef += ' id3';
+  verifyItems(props, [prop1, prop2, prop3], "props");
+  verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
+  verifyNamedItems(propsB, [prop2], ['barbaz'], "propsB");
+  verifyNamedItems(propsX, [], [], "propsX");
+
+  // children of itemscope'd candidate element not included even if
+  // itemref'd
+  var prop4 = document.createElement('div');
+  prop4.id = 'id4';
+  prop4.itemProp = 'propA';
+  prop4.itemScope = true;
+  item.appendChild(prop4);
+  var prop5 = document.createElement('div');
+  prop5.id = 'id5';
+  prop5.itemProp = 'propB';
+  prop4.appendChild(prop5);
+  item.itemRef += ' id5';
+  verifyItems(props, [prop1, prop4, prop2, prop3], "props");
+  verifyNamedItems(propsA, [prop1, prop4], ['foo', prop4], "propsA");
+  verifyNamedItems(propsB, [prop2], ['barbaz'], "propsB");
+  verifyNamedItems(propsX, [], [], "propsX");
+
+  // destroy
   parent.innerHTML = '';
+  verifyItems(props, [], "props");
+  verifyNamedItems(propsA, [], [], "propsA");
+  verifyNamedItems(propsB, [], [], "propsB");
+  verifyNamedItems(propsX, [], [], "propsX");
 });
 
 };
