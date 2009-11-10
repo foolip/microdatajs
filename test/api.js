@@ -1,4 +1,4 @@
-window.onload = function() {
+module("DOM API");
 
 function testBoolReflection(tag, attr, prop) {
   var elm = document.createElement(tag);
@@ -137,8 +137,17 @@ test("object .itemValue reflects @data", function() {
   testItemValueReflection('object', 'data', 'http://example.com/');
 });
 
-test("time .itemValue reflects @datetime (when present)", function() {
-  ok(false);
+test("time .itemValue reflection depends on @datetime", function() {
+  var elm = document.createElement('time');
+  elm.itemProp = 'testDate';
+  elm.itemValue = 'January 1970';
+  equals(elm.textContent, 'January 1970', '.itemValue -> textContent');
+  elm.textContent = 'September 1984';
+  equals(elm.itemValue, 'September 1984', 'textContent -> .itemValue');
+  elm.setAttribute('datetime', '1970-01-01');
+  equals(elm.itemValue, '1970-01-01', '@datetime -> .itemValue');
+  elm.itemValue = '1984-09-03';
+  equals(elm.getAttribute('datetime'), '1984-09-03', '.itemValue -> @datetime');
 });
 
 test("div .itemValue acts as .textContent", function() {
@@ -385,5 +394,3 @@ test("HTMLElement.properties", function() {
   verifyNamedItems(propsB, [], [], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
 });
-
-};

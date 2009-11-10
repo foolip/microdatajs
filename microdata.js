@@ -133,6 +133,8 @@ reflectString('itemtype', 'itemType');
 reflectString('itemid', 'itemId');
 reflectString('itemprop', 'itemProp');
 reflectString('itemref', 'itemRef');
+// FIXME: only if not browser-implemented
+reflectString('datetime', 'dateTime');
 
 function getItemValueProperty(e) {
     var tag = e.tagName.toUpperCase();
