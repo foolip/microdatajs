@@ -135,18 +135,19 @@ reflectString('itemprop', 'itemProp');
 reflectString('itemref', 'itemRef');
 
 function getItemValueProperty(e) {
-    if (e.tagName == 'META')
+    var tag = e.tagName.toUpperCase();
+    if (tag == 'META')
 	return 'content';
-    if (e.tagName == 'AUDIO' || e.tagName == 'EMBED' ||
-	e.tagName == 'IFRAME' || e.tagName == 'IMG' ||
-	e.tagName == 'SOURCE' || e.tagName == 'VIDEO')
+    if (tag == 'AUDIO' || tag == 'EMBED' ||
+	tag == 'IFRAME' || tag == 'IMG' ||
+	tag == 'SOURCE' || tag == 'VIDEO')
 	return 'src';
-    if (e.tagName == 'A' || e.tagName == 'AREA' || e.tagName == 'LINK')
+    if (tag == 'A' || tag == 'AREA' || tag == 'LINK')
 	return 'href';
-    if (e.tagName == 'OBJECT')
+    if (tag == 'OBJECT')
 	return 'data';
-    if (e.tagName == 'TIME' && e.hasAttribute('datetime'))
-	return 'datetime';
+    if (tag == 'TIME' && e.hasAttribute('datetime'))
+	return 'dateTime';
     return 'textContent';
 }
 
