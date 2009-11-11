@@ -128,12 +128,93 @@ function reflectString(attr, prop) {
 	  set: function (val) { this.setAttribute(attr, val); }});
 }
 
+function reflectSettableTokenList(attr, prop) {
+    function getter() {
+	var elem = this;
+	var list = [];
+	list.item = function(index) { return this[index]; };
+
+	function update() {
+	    list.length = 0;
+	    if (elem.hasAttribute(attr))
+		list.push.apply(list, splitTokens(elem.getAttribute(attr)));
+	}
+	update();
+
+	list.__defineGetter__('value', function() { return elem.hasAttribute(attr) ? elem.getAttribute(attr) : ''; });
+	list.__defineSetter__('value', function(val) { elem.setAttribute(attr, val); });
+
+	function validate(token) {
+	    if (!token)
+		throw new Error('SYNTAX_ERR');
+	    if (/\s/.test(token))
+		throw new Error('INVALID_CHARACTER_ERR');
+	}
+
+	list.contains = function(token) {
+	    validate(token);
+	    return inList(token, this);
+	};
+	if (elem.addEventListener)
+	    elem.addEventListener('DOMAttrModified', update, false);
+	list.add = function(token) {
+	    validate(token);
+	    if (!inList(token, this)) {
+		var attrValue = elem.hasAttribute(attr) ? elem.getAttribute(attr) : '';
+		if (attrValue.length && attrValue[attrValue.length-1] != ' ')
+		    attrValue += ' ';
+		attrValue += token;
+		elem.setAttribute(attr, attrValue);
+	    }
+	};
+	list.remove = function(token) {
+	    validate(token);
+	    var input = elem.hasAttribute(attr) ? elem.getAttribute(attr) : '';
+	    var output = '';
+	    while (input) {
+		var m = /^(\s+)?(\S+)(\s+)?/.exec(input);
+		if (m) {
+		    input = input.substr(m[0].length);
+		    if (m[2] == token) {
+			output = output.replace(/\s+$/, '');
+			if (input && output)
+			    output += ' ';
+		    } else {
+			output += m[0];
+		    }
+		} else {
+		    output += input;
+		    break;
+		}
+	    }
+	    elem.setAttribute(attr, output);
+	};
+	list.toggle = function(token) {
+	    validate(token);
+	    if (this.contains(token)) {
+		this.remove(token);
+		return false;
+	    } else {
+		this.add(token);
+		return true;
+	    }
+	};
+	return list;
+    }
+    function setter(val) {
+	this.setAttribute(attr, val);
+    }
+    Object.defineProperty(Element.prototype, prop,
+	{ get: getter, set: setter });
+}
+
 reflectBoolean('itemscope', 'itemScope');
 // FIXME: should be URL?
 reflectString('itemtype', 'itemType');
 // FIXME: should be URL?
 reflectString('itemid', 'itemId');
-reflectString('itemprop', 'itemProp');
+reflectSettableTokenList('itemprop', 'itemProp');
+// FIXME: should also be DOMSettableTokenList?
 reflectString('itemref', 'itemRef');
 // FIXME: only if not browser-implemented
 reflectString('datetime', 'dateTime');
@@ -238,10 +319,9 @@ function() {
     function updateNames() {
 	props.names.length = 0;
 	for (var i = 0; i < props.length; i++) {
-	    var propNames = splitTokens(props[i].getAttribute('itemprop'));
-	    for (var j = 0; j < propNames.length; j++) {
-		if (!inList(propNames[j], props.names))
-		    props.names.push(propNames[j]);
+	    for (var j=0; j<props[i].itemProp.length; j++) {
+		if (!inList(props[i].itemProp[j], props.names))
+		    props.names.push(props[i].itemProp[j]);
 	    }
 	}
     }
@@ -250,7 +330,7 @@ function() {
 	pnl.length = 0;
 	pnl.values.length = 0;
 	for (var i=0; i<props.length; i++) {
-	    if (inList(name, splitTokens(props[i].getAttribute('itemprop')))) {
+	    if (inList(name, props[i].itemProp)) {
 		pnl.push(props[i]);
 		pnl.values.push(props[i].itemValue);
 	    }

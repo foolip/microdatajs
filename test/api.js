@@ -61,8 +61,103 @@ test(".itemId reflects @itemid", function() {
   testStringReflection('span', 'itemid', 'itemId', 'http://example.com/item');
 });
 
-test(".itemProp reflects @itemprop", function() {
-  testStringReflection('span', 'itemprop', 'itemProp', 'Semantic Thing');
+function verifyTokenList(actual, expected) {
+  equals(actual.length, expected.length);
+  for (var i=0; i < actual.length && i < expected.length; i++) {
+    equals(actual.item(i), expected[i]);
+    equals(actual[i], expected[i]);
+  }
+}
+
+test(".itemProp reflects @itemprop (DOMSettableTokenList)", 
+function() {
+  // content attribute -> DOMSettableTokenList
+  var elm = document.createElement('div');
+  var list = elm.itemProp;
+  equals(list.value, '');
+  verifyTokenList(list, []);
+  ok(!list.contains('a'));
+  ok(!list.contains('b'));
+
+  elm.setAttribute('itemprop', ' ');
+  equals(list.value, ' ');
+  verifyTokenList(list, []);
+  ok(!list.contains('a'));
+  ok(!list.contains('b'));
+
+  elm.setAttribute('itemprop', ' a');
+  equals(list.value, ' a');
+  verifyTokenList(list, ['a']);
+  ok(list.contains('a'));
+  ok(!list.contains('b'));
+
+  elm.setAttribute('itemprop', 'a  b ');
+  equals(list.value, 'a  b ');
+  verifyTokenList(list, ['a', 'b']);
+  ok(list.contains('a'));
+  ok(list.contains('b'));
+
+  elm.removeAttribute('itemprop');
+  equals(list.value, '');
+  verifyTokenList(list, []);
+
+  // DOMSettableTokenList.add()
+  function testAdd(before, token, after) {
+      list.value = before;
+      list.add(token);
+      equals(list.value, after, '"'+before+'" add("'+token+'") -> "'+after+'"');
+  }
+  testAdd('', 'a', 'a');
+  testAdd('a', 'a', 'a');
+  testAdd(' a', 'a', ' a');
+  testAdd('a ', 'a', 'a ');
+  testAdd(' a ', 'a', ' a ');
+  testAdd('a', 'b', 'a b');
+  testAdd(' a', 'b', ' a b');
+  testAdd('  a', 'b', '  a b');
+  testAdd('a ', 'b', 'a b');
+  testAdd('a  ', 'b', 'a  b');
+  testAdd(' a ', 'b', ' a b');
+  testAdd('  a  ', 'b', '  a  b');
+  testAdd('a a', 'b', 'a a b');
+  testAdd(' a a', 'b', ' a a b');
+  testAdd('a a ', 'b', 'a a b');
+  testAdd(' a a ', 'b', ' a a b');
+  testAdd('a  a', 'b', 'a  a b');
+  testAdd('  a  a', 'b', '  a  a b');
+  testAdd('a  a  ', 'b', 'a  a  b');
+  testAdd('  a  a  ', 'b', '  a  a  b');
+
+  // DOMSettableTokenList.remove()
+  function testRemove(before, token, after) {
+      list.value = before;
+      list.remove(token);
+      equals(list.value, after, '"'+before+'" remove("'+token+'") -> "'+after+'"');
+  }
+  testRemove('a', 'a', '');
+  testRemove('a ', 'a', '');
+  testRemove(' a', 'a', '');
+  testRemove(' a ', 'a', '');
+  testRemove('a a ', 'a', '');
+  testRemove(' a a ', 'a', '');
+  testRemove('a a  ', 'a', '');
+  testRemove(' a a  ', 'a', '');
+  testRemove('a b', 'a', 'b');
+  testRemove(' a b ', 'a', 'b ');
+  testRemove('b a', 'a', 'b');
+  testRemove(' b a', 'a', ' b');
+  testRemove('a b a', 'a', 'b');
+  testRemove('a b  b a', 'a', 'b  b');
+
+  // DOMSettableTokenList.toggle
+  function testToggle(before, token, after, retval) {
+      list.value = before;
+      var ret = list.toggle(token);
+      equals(list.value, after, '"'+before+'" toggle("'+token+'") -> "'+after+'"');
+      equals(ret, retval);
+  }
+  testToggle('', 'a', 'a', true);
+  testToggle('a', 'a', '', false);
 });
 
 test(".itemRef reflects @itemref", function() {
