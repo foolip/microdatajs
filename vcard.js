@@ -101,41 +101,40 @@ function extract_vCard(node) {
     var firstOrg = null;
     var firstFN = null;
     var props = node.properties;
-    for (var i=0; i<props.length; i++) {
-	// FIXME: element's property names?
-	var nameList = splitTokens(props[i].itemProp);
-	for (var j=0; j<nameList.length; j++) {
-	    var name = nameList[j];
+    for (var propIndex=0; propIndex<props.length; propIndex++) {
+	var prop = props[propIndex];
+	for (var nameIndex=0; nameIndex<prop.itemProp.length; nameIndex++) {
+	    var name = prop.itemProp[nameIndex];
 	    var params = [];
 	    var value;
 	    function addParam(n, v) {
 		params.push({name:n,value:v});
 	    }
-	    if (props[i].itemScope) {
-		var subitem = props[i];
+	    if (prop.itemScope) {
+		var subitem = prop;
 		function addTypeParam() {
-		    var prop = subitem.properties.namedItem('type')[0];
-		    if (prop && !prop.itemScope &&
-			/^[0-9A-Za-z]*$/.test(prop.itemValue))
-			addParam('TYPE', prop.itemValue);
+		    var typeProp = subitem.properties.namedItem('type')[0];
+		    if (typeProp && !typeProp.itemScope &&
+			/^[0-9A-Za-z]*$/.test(typeProp.itemValue))
+			addParam('TYPE', typeProp.itemValue);
 		}
 		function escapeProps(name) {
-		    var value = '';
-		    var props = subitem.properties.namedItem(name);
-		    for (var p=0; p<props.length && !props[p].itemScope; p++) {
-			if (value.length)
-			    value += ',';
-			value += escapeString(props[p].itemValue);
+		    var escaped = '';
+		    var allProps = subitem.properties.namedItem(name);
+		    for (var i=0; i<allProps.length && !allProps[i].itemScope; i++) {
+			if (escaped.length)
+			    escaped += ',';
+			escaped += escapeString(allProps[i].itemValue);
 		    }
-		    return value;
+		    return escaped;
 		}
 		function escapeFirstProp(name) {
-		    var prop = subitem.properties.namedItem(name)[0];
-		    return (prop && !prop.itemScope) ? escapeString(prop.itemValue) : '';
+		    var firstProp = subitem.properties.namedItem(name)[0];
+		    return (firstProp && !firstProp.itemScope) ? escapeString(firstProp.itemValue) : '';
 		}
 
 		if (name == 'n') {
-		    if (firstN == null)
+		    if (!firstN)
 			firstN = subitem;
 		    value = escapeFirstProp('family-name')+';'+
 			escapeFirstProp('given-name')+';'+
@@ -152,7 +151,7 @@ function extract_vCard(node) {
 			escapeFirstProp('country-name');
 		    addTypeParam();
 		} else if (name == 'org') {
-		    if (firstOrg == null)
+		    if (!firstOrg)
 			firstOrg = subitem;
 		    value = escapeFirstProp('organization-name', subitem);
 		    var units = subitem.properties.namedItem('organization-unit');
@@ -170,22 +169,21 @@ function extract_vCard(node) {
 		    addTypeParam();
 		}
 	    } else {
-		var elem = props[i];
 		// the property's value is not an item
-		if (name == 'fn' && firstFN == null) {
-		    firstFN = elem;
-		} else if (name == 'org' && firstOrg == null) {
-		    firstOrg = elem;
+		if (name == 'fn' && !firstFN) {
+		    firstFN = prop;
+		} else if (name == 'org' && !firstOrg) {
+		    firstOrg = prop;
 		}
-		value = elem.itemValue;
-		var tag = elem.tagName.toUpperCase();
+		value = prop.itemValue;
+		var tag = prop.tagName.toUpperCase();
 		// http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#url-property-elements
 		if (/^A|AREA|AUDIO|EMBED|IFRAME|IMG|LINK|OBJECT|SOURCE|VIDEO$/.test(tag)) {
 		    addParam('VALUE', 'URI');
 		} else if (tag == 'TIME') {
-		    if (isValidDateString(elem.itemValue)) {
+		    if (isValidDateString(prop.itemValue)) {
 			addParam('VALUE', 'DATE');
-		    } else if (isValidGlobalDateAndTimeString(elem.itemValue)) {
+		    } else if (isValidGlobalDateAndTimeString(prop.itemValue)) {
 			addParam('VALUE', 'DATE-TIME');
 		    }
 		}
@@ -194,29 +192,27 @@ function extract_vCard(node) {
 	    addLine(name, params, value);
 	}
     }
-    if (firstN == null) {
-	if (firstFN == null || firstFN.itemScope) {
-	    alert('FIXME! SKIP!');
+    if (!firstN && firstFN && !firstFN.itemScope) {
+	function addN(first, second) {
+	    var value = escapeString(first)+';'+escapeString(second)+';;;';
+	    addLine('N', [], value);
 	}
-	if (firstOrg != null && !firstOrg.itemScope && firstOrg == firstFN) {
-	    alert('company vcard?');
-	}
-	var m = /^(\S+)(\s+(\S+))?$/.exec(firstFN.itemValue);
-	if (m) {
-	    var p1 = m[1];
-	    var p2 = m[3] || '';
-	    function addN(first, second) {
-		var value = escapeString(first)+';'+escapeString(second)+';;;';
-		addLine('N', [], value);
-	    }
-	    if (p1[p1.length-1] == ',') {
-		addN(p1.substr(0, p1.length-1), p2);
-	    } else if (p2.length==2 && p2[1]=='.') {
-		addN(p1, p2[0]);
-	    } else if (p2.length==1) {
-		addN(p1, p2);
-	    } else {
-		addN(p2, p1);
+	if (firstOrg && !firstOrg.itemScope && firstOrg == firstFN) {
+	    addN('', '');
+	} else {
+	    var m = /^(\S+)(\s+(\S+))?$/.exec(firstFN.itemValue);
+	    if (m) {
+		var p1 = m[1];
+		var p2 = m[3] || '';
+		if (p1[p1.length-1] == ',') {
+		    addN(p1.substr(0, p1.length-1), p2);
+		} else if (p2.length==2 && p2[1]=='.') {
+		    addN(p1, p2[0]);
+		} else if (p2.length==1) {
+		    addN(p1, p2);
+		} else {
+		    addN(p2, p1);
+		}
 	    }
 	}
     }
