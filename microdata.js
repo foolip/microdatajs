@@ -24,7 +24,8 @@ if (typeof document.documentElement.textContent == 'undefined') {
 // utility functions
 
 function splitTokens(s) {
-    if (s && /\S/.test(s)) return s.split(/\s+/);
+    if (s && /\S/.test(s))
+	return s.replace(/^\s+|\s+$/g,'').split(/\s+/);
     return [];
 }
 
@@ -48,8 +49,7 @@ function fakeCollection(rootElem, incFilter, recFilter) {
     elems.item = function(idx){return this[idx];};
 
     function update(_incFilter, _recFilter) {
-	while (elems.length)
-	    elems.pop();
+	elems.length = 0;
 	function pushElements(elem) {
 	    if (_incFilter(elem))
 		elems.push(elem);
@@ -129,7 +129,9 @@ function reflectString(attr, prop) {
 }
 
 reflectBoolean('itemscope', 'itemScope');
+// FIXME: should be URL?
 reflectString('itemtype', 'itemType');
+// FIXME: should be URL?
 reflectString('itemid', 'itemId');
 reflectString('itemprop', 'itemProp');
 reflectString('itemref', 'itemRef');
@@ -234,8 +236,7 @@ function() {
 
     props.names = [];
     function updateNames() {
-	while (props.names.length)
-	    props.names.pop();
+	props.names.length = 0;
 	for (var i = 0; i < props.length; i++) {
 	    var propNames = splitTokens(props[i].getAttribute('itemprop'));
 	    for (var j = 0; j < propNames.length; j++) {
@@ -246,10 +247,8 @@ function() {
     }
 
     function updatePropertyNodeList(pnl, name) {
-	while (pnl.length)
-	    pnl.pop();
-	while (pnl.values.length)
-	    pnl.values.pop();
+	pnl.length = 0;
+	pnl.values.length = 0;
 	for (var i=0; i<props.length; i++) {
 	    if (inList(name, splitTokens(props[i].getAttribute('itemprop')))) {
 		pnl.push(props[i]);
