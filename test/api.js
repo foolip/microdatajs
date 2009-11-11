@@ -288,6 +288,10 @@ function verifyValues(actual, expected, message) {
   }
 }
 
+function verifyNames(actual, expected, message) {
+  verifyValues(actual, expected, message);
+}
+
 function verifyNamedItems(actual, props, values, message) {
   verifyItems(actual, props, message);
   verifyValues(actual.values, values, message+'.values');
@@ -299,6 +303,7 @@ test("HTMLElement.properties", function() {
   parent.appendChild(item);
 
   var props = item.properties;
+  var names = props.names;
   var propsA = props.namedItem('propA');
   var propsB = props.namedItem('propB');
   var propsX = props.namedItem('propX');
@@ -313,6 +318,7 @@ test("HTMLElement.properties", function() {
 
   // non-item matches nothing
   verifyItems(props, [], "props");
+  verifyNames(names, [], "names");
   verifyNamedItems(propsA, [], [], "propsA");
   verifyNamedItems(propsB, [], [], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
@@ -320,6 +326,7 @@ test("HTMLElement.properties", function() {
   // item without any properties
   item.itemScope = true;
   verifyItems(props, [], "props");
+  verifyNames(names, [], "names");
   verifyNamedItems(propsA, [], [], "propsA");
   verifyNamedItems(propsB, [], [], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
@@ -329,6 +336,7 @@ test("HTMLElement.properties", function() {
   prop1.itemProp = 'propA';
   item.appendChild(prop1);
   verifyItems(props, [prop1], "props");
+  verifyNames(names, ['propA'], "names");
   verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
   verifyNamedItems(propsB, [], [], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
@@ -339,6 +347,7 @@ test("HTMLElement.properties", function() {
   prop2.itemProp = 'propB';
   parent.appendChild(prop2);
   verifyItems(props, [prop1], "props");
+  verifyNames(names, ['propA'], "names");
   verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
   verifyNamedItems(propsB, [], [], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
@@ -347,6 +356,7 @@ test("HTMLElement.properties", function() {
   prop2.id = 'id2';
   item.itemRef = 'id2';
   verifyItems(props, [prop1, prop2], "props");
+  verifyNames(names, ['propA', 'propB'], "names");
   verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
   verifyNamedItems(propsB, [prop2], ['bar'], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
@@ -354,6 +364,7 @@ test("HTMLElement.properties", function() {
   // redundant itemref
   item.itemRef += ' id2';
   verifyItems(props, [prop1, prop2], "props");
+  verifyNames(names, ['propA', 'propB'], "names");
   verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
   verifyNamedItems(propsB, [prop2], ['bar'], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
@@ -366,6 +377,7 @@ test("HTMLElement.properties", function() {
   prop2.appendChild(prop3);
   item.itemRef += ' id3';
   verifyItems(props, [prop1, prop2, prop3], "props");
+  verifyNames(names, ['propA', 'propB', 'propC'], "names");
   verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
   verifyNamedItems(propsB, [prop2], ['barbaz'], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
@@ -383,6 +395,7 @@ test("HTMLElement.properties", function() {
   prop4.appendChild(prop5);
   item.itemRef += ' id5';
   verifyItems(props, [prop1, prop4, prop2, prop3], "props");
+  verifyNames(names, ['propA', 'propB', 'propC'], "names");
   verifyNamedItems(propsA, [prop1, prop4], ['foo', prop4], "propsA");
   verifyNamedItems(propsB, [prop2], ['barbaz'], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
@@ -390,6 +403,7 @@ test("HTMLElement.properties", function() {
   // destroy
   parent.innerHTML = '';
   verifyItems(props, [], "props");
+  verifyNames(names, [], "names");
   verifyNamedItems(propsA, [], [], "propsA");
   verifyNamedItems(propsB, [], [], "propsB");
   verifyNamedItems(propsX, [], [], "propsX");
