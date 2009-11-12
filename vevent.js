@@ -1,8 +1,20 @@
 // http://www.whatwg.org/specs/vocabs/current-work/#conversion-to-icalendar
-function convertToICalendar() {
-    var events = document.getItems('http://microformats.org/profile/hcalendar#vevent');
+function getICal(node) {
+    var veventURI = 'http://microformats.org/profile/hcalendar#vevent';
+    var events;
+    if (node) {
+	while (node && (!node.itemScope || node.itemType != veventURI))
+	    node = node.parentNode;
+	if (!node)
+	    return;
+	events = [node];
+    } else {
+	events = document.getItems(veventURI);
+    }
+
     if (events.length == 0)
 	return;
+
     var output = '';
     // http://www.whatwg.org/specs/vocabs/current-work/#add-an-icalendar-line
     function addLine(type, value, annotation) {

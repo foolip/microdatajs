@@ -61,8 +61,18 @@ function escapeString(value, chars) {
 }
 
 // http://www.whatwg.org/specs/vocabs/current-work/#conversion-to-vcard
-// begins with input node at step 2 in the algorithm
-function extract_vCard(node) {
+function getVCard(node) {
+    var hcardURI = 'http://microformats.org/profile/hcard';
+    if (node) {
+	while (node && (!node.itemScope || node.itemType != hcardURI))
+	    node = node.parentNode;
+    } else {
+	node = document.getItems(hcardURI)[0];
+    }
+
+    if (!node)
+	return;
+
     var output = '';
     // http://www.whatwg.org/specs/vocabs/current-work/#add-a-vcard-line
     function addLine(type, params, value) {
@@ -159,9 +169,8 @@ function extract_vCard(node) {
 			if (!units[unit].itemScope)
 			    value += ';'+escapeString(units[unit].itemValue);
 		    }
-		} else if (name == 'agent' &&
-			   subitem.itemType == 'http://microformats.org/profile/hcard') {
-		    value = escapeString(extract_vCard(subitem));
+		} else if (name == 'agent' && subitem.itemType == hcardURI) {
+		    value = escapeString(getVCard(subitem));
 		    addParam('VALUE', 'VCARD');
 		} else {
 		    // the property's value is an item and name is none of the above
