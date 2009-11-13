@@ -1,3 +1,5 @@
+if (!document.getItems) {
+
 // emulate Object.defineProperty
 if (!Object.defineProperty && document.__defineGetter__) {
     Object.defineProperty = function(obj, prop, desc) {
@@ -387,3 +389,5 @@ document.getItems = function(typeNames) {
 
     return fakeCollection(this.documentElement, isTopLevelItem);
 };
+    
+}
