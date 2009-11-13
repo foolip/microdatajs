@@ -101,7 +101,6 @@ function getVCard(node) {
     addLine("PROFILE", [], "VCARD");
     addLine("VERSION", [], "3.0");
     addLine("SOURCE", [], escapeString(document.location.href));
-    // FIXME: is this the title element as per spec?
     var title = document.getElementsByTagName("title")[0];
     if (title)
 	addLine("NAME", [], escapeString(title.textContent));
