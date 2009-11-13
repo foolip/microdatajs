@@ -1,5 +1,10 @@
 if (!document.getItems) {
 
+// trick IE into handling these elements properly
+document.createElement('audio');
+document.createElement('video');
+document.createElement('time');
+
 // emulate Object.defineProperty
 if (!Object.defineProperty && document.__defineGetter__) {
     Object.defineProperty = function(obj, prop, desc) {
