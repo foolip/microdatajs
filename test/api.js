@@ -61,11 +61,16 @@ test(".itemId reflects @itemid", function() {
   testStringReflection('span', 'itemid', 'itemId', 'http://example.com/item');
 });
 
-function verifyTokenList(actual, expected) {
-  equals(actual.length, expected.length);
-  for (var i=0; i < actual.length && i < expected.length; i++) {
-    equals(actual.item(i), expected[i]);
-    equals(actual[i], expected[i]);
+function verifyTokenList(list, value, allItems, notContainItems) {
+  equals(list.value, value, 'token list .value'+value);
+  equals(list.length, allItems.length, 'token list length');
+  for (var i=0; i < list.length && i < allItems.length; i++) {
+    equals(list.item(i), allItems[i], 'token list .item() getter');
+    equals(list[i], allItems[i], 'token list [] getter');
+    ok(list.contains(allItems[i]), 'token list contains '+allItems[i]);
+  }
+  for (i=0; i<notContainItems.length; i++) {
+    ok(!list.contains(notContainItems[i]), 'token list does not contain '+notContainItems[i]);
   }
 }
 
@@ -74,32 +79,19 @@ function() {
   // content attribute -> DOMSettableTokenList
   var elm = document.createElement('div');
   var list = elm.itemProp;
-  equals(list.value, '');
-  verifyTokenList(list, []);
-  ok(!list.contains('a'));
-  ok(!list.contains('b'));
+  verifyTokenList(list, '', [], ['a', 'b']);
 
   elm.setAttribute('itemprop', ' ');
-  equals(list.value, ' ');
-  verifyTokenList(list, []);
-  ok(!list.contains('a'));
-  ok(!list.contains('b'));
+  verifyTokenList(list, ' ', [], ['a', 'b']);
 
   elm.setAttribute('itemprop', ' a');
-  equals(list.value, ' a');
-  verifyTokenList(list, ['a']);
-  ok(list.contains('a'));
-  ok(!list.contains('b'));
+  verifyTokenList(list, ' a', ['a'], ['b']);
 
   elm.setAttribute('itemprop', 'a  b ');
-  equals(list.value, 'a  b ');
-  verifyTokenList(list, ['a', 'b']);
-  ok(list.contains('a'));
-  ok(list.contains('b'));
+  verifyTokenList(list, 'a  b ', ['a', 'b'], []);
 
   elm.removeAttribute('itemprop');
-  equals(list.value, '');
-  verifyTokenList(list, []);
+  verifyTokenList(list, '', [], ['a', 'b']);
 
   // DOMSettableTokenList.add()
   function testAdd(before, token, after) {
