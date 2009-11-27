@@ -90,6 +90,9 @@ function() {
   elm.setAttribute('itemprop', 'a  b ');
   verifyTokenList(list, 'a  b ', ['a', 'b'], []);
 
+  elm.setAttribute('itemprop', 'a  b b');
+  verifyTokenList(list, 'a  b b', ['a', 'b', 'b'], []);
+
   elm.removeAttribute('itemprop');
   verifyTokenList(list, '', [], ['a', 'b']);
 
