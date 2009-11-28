@@ -142,7 +142,17 @@ function() {
   testRemove('b a', 'a', 'b');
   testRemove(' b a', 'a', ' b');
   testRemove('a b a', 'a', 'b');
+  testRemove(' a b a ', 'a', 'b');
+  testRemove('a b a', 'b', 'a a');
+  testRemove(' a b a ', 'b', ' a a ');
   testRemove('a b  b a', 'a', 'b  b');
+  testRemove(' a b  b a ', 'a', 'b  b');
+  testRemove('a b  b a', 'b', 'a a');
+  testRemove(' a b  b a ', 'b', ' a a ');
+  testRemove('a b a b', 'a', 'b b');
+  testRemove(' a b a b ', 'a', 'b b ');
+  testRemove('a b a b', 'b', 'a a');
+  testRemove(' a b a b ', 'b', ' a a');
 
   // DOMSettableTokenList.toggle
   function testToggle(before, token, after, retval) {
@@ -153,6 +163,32 @@ function() {
   }
   testToggle('', 'a', 'a', true);
   testToggle('a', 'a', '', false);
+});
+
+var throwMethods = ['contains', 'add', 'remove', 'toggle'];
+
+test("DOMSettableTokenList access with empty token throws SYNTAX_ERR", function() {
+  for (var i=0; i<throwMethods.length; i++) {
+    var elm = document.createElement('div');
+    try {
+      elm.itemProp[throwMethods[i]]('');
+    } catch (e) {
+      equals(e.code, 12, throwMethods[i]);
+    }
+  }
+  expect(throwMethods.length);
+});
+
+test("DOMSettableTokenList access with whitespace token throws INVALID_CHARACTER_ERR", function() {
+  for (var i=0; i<throwMethods.length; i++) {
+    var elm = document.createElement('div');
+    try {
+      elm.itemProp[throwMethods[i]](' ');
+    } catch (e) {
+      equals(e.code, 5, throwMethods[i]);
+    }
+  }
+  expect(throwMethods.length);
 });
 
 test(".itemRef reflects @itemref", function() {
