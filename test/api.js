@@ -72,6 +72,8 @@ function verifyTokenList(list, value, allItems, notContainItems) {
   for (i=0; i<notContainItems.length; i++) {
     ok(!list.contains(notContainItems[i]), 'token list does not contain '+notContainItems[i]);
   }
+  var stringified = ''+list;
+  equals(stringified, value, 'token list stringifies to underlying value');
 }
 
 test(".itemProp reflects @itemprop (DOMSettableTokenList)", 
