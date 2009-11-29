@@ -264,6 +264,22 @@ Object.defineProperty(Element.prototype, 'itemValue',
 
 // Element.properties
 
+// http://lists.whatwg.org/htdig.cgi/whatwg-whatwg.org/2009-November/024212.html
+function getCorrespondingItem(node) {
+    var current = node;
+    while (current) {
+	if (current.id) {
+	    var referrer = document.querySelector('*[itemref~='+current.id+']');
+	    if (referrer && referrer != node)
+		return referrer;
+	}
+	current = current.parentNode;
+	if (current && current.itemScope)
+	    return current;
+    }
+    return null;
+}
+
 Object.defineProperty(Element.prototype, 'properties', { get:
 function() {
     // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#the-properties-of-an-item
@@ -271,57 +287,11 @@ function() {
 
     var props = [];
     function updateProperties(elemFilter) {
-	var root = itemElem;
-
 	props.length = 0;
-
-	// when the root isn't a item in the document, match nothing
-	// FIXME: the spec doesn't actually say this.
-	if (!root.itemScope || !contains(document.documentElement, root))
-	    return;
-
-	var pending = [];
-	function pushChildren(e) {
-	    for (var child = e.lastChild; child; child = child.previousSibling) {
-		if (child.nodeType == 1 && elemFilter(child)) {
-		    pending.push(child);
-		}
-	    }
-	}
-	pushChildren(root);
-
-	function getScopeNode(e) {
-	    var scope = e.parentNode;
-	    while (scope && !scope.itemScope)
-		scope = scope.parentNode;
-	    return scope;
-	}
-	var refIds = splitTokens(root.itemRef);
-	idloop: for (var i=0; i<refIds.length; i++) {
-	    var candidate = document.getElementById(refIds[i]);
-	    if (!candidate || !elemFilter(candidate))
-		continue;
-	    var scope = getScopeNode(candidate);
-	    for (var j=0; j<pending.length; j++) {
-		if (candidate == pending[j])
-		    continue idloop;
-		if (contains(pending[j], candidate) &&
-		    (pending[j] == scope ||
-		     getScopeNode(pending[j]) == scope))
-		    continue idloop;
-	    }
-	    pending.push(candidate);
-	}
-
-	// from http://www.quirksmode.org/dom/getElementsByTagNames.html
-	pending.sort(function (a,b){return (a.compareDocumentPosition(b)&6)-3;});
-
-	while (pending.length) {
-	    var current = pending.pop();
-	    if (current.hasAttribute('itemprop'))
-		props.push(current);
-	    if (!current.hasAttribute('itemscope'))
-		pushChildren(current);
+	var docProps = document.querySelectorAll('*[itemprop]');
+	for (var i = 0; i < docProps.length; i++) {
+	    if (elemFilter(docProps[i]) && getCorrespondingItem(docProps[i]) == itemElem)
+		props.push(docProps[i]);
 	}
     }
 

@@ -1,4 +1,4 @@
-module("DOM API");
+/* -*- mode: js2; js2-basic-offset: 2; indent-tabs-mode: nil -*- */
 
 function testBoolReflection(tag, attr, prop) {
   var elm = document.createElement(tag);
@@ -49,17 +49,25 @@ function testItemValueReflection(tag, attr, str) {
   testStringReflection(elm, attr, 'itemValue', str);
 }
 
+module("HTMLElement.itemScope");
+
 test(".itemScope reflects @itemscope", function() {
   testBoolReflection('span', 'itemscope', 'itemScope');
 });
+
+module("HTMLElement.itemType");
 
 test(".itemType reflects @itemtype", function() {
   testStringReflection('span', 'itemtype', 'itemType', 'http://example.com/vocab#thing');
 });
 
+module("HTMLElement.itemId");
+
 test(".itemId reflects @itemid", function() {
   testStringReflection('span', 'itemid', 'itemId', 'http://example.com/item');
 });
+
+module("HTMLElement.itemProp");
 
 function verifyTokenList(list, value, allItems, notContainItems) {
   equals(list.value, value, 'token list .value'+value);
@@ -76,7 +84,7 @@ function verifyTokenList(list, value, allItems, notContainItems) {
   equals(stringified, value, 'token list stringifies to underlying value');
 }
 
-test(".itemProp reflects @itemprop (DOMSettableTokenList)", 
+test(".itemProp reflects @itemprop",
 function() {
   // content attribute -> DOMSettableTokenList
   var elm = document.createElement('div');
@@ -169,7 +177,7 @@ function() {
 
 var throwMethods = ['contains', 'add', 'remove', 'toggle'];
 
-test("DOMSettableTokenList access with empty token throws SYNTAX_ERR", function() {
+test("empty token throws SYNTAX_ERR", function() {
   for (var i=0; i<throwMethods.length; i++) {
     var elm = document.createElement('div');
     try {
@@ -181,7 +189,7 @@ test("DOMSettableTokenList access with empty token throws SYNTAX_ERR", function(
   expect(throwMethods.length);
 });
 
-test("DOMSettableTokenList access with whitespace token throws INVALID_CHARACTER_ERR", function() {
+test("whitespace in token throws INVALID_CHARACTER_ERR", function() {
   for (var i=0; i<throwMethods.length; i++) {
     var elm = document.createElement('div');
     try {
@@ -193,9 +201,13 @@ test("DOMSettableTokenList access with whitespace token throws INVALID_CHARACTER
   expect(throwMethods.length);
 });
 
+module("HTMLElement.itemRef");
+
 test(".itemRef reflects @itemref", function() {
   testStringReflection('span', 'itemref', 'itemRef', 'id1 id2');
 });
+
+module("HTMLElement.itemValue");
 
 test(".itemValue without @itemprop", function() {
   var elm = document.createElement('div');
@@ -301,6 +313,8 @@ function verifyItems(actual, expected, message) {
     equals(actual[i], expected[i], message+'['+i+']');
   }
 }
+
+module("HTMLDocument.getItems");
 
 test("document.getItems()", function() {
   var items = document.getItems();
@@ -425,114 +439,274 @@ function verifyNamedItems(actual, props, values, message) {
   verifyValues(actual.values, values, message+'.values');
 }
 
-test("HTMLElement.properties", function() {
-  var parent = document.getElementById("parent");
-  var item = document.createElement('div');
-  parent.appendChild(item);
+module("HTMLElement.properties");
 
-  var props = item.properties;
-  var names = props.names;
-  var propsA = props.namedItem('propA');
-  var propsB = props.namedItem('propB');
-  var propsX = props.namedItem('propX');
+(
+function() {
+  var parent, item, props, names, propsA, propsB, propsX;
+  var prop1, prop2, prop3, prop4, subProps;
 
-  equals(typeof props, 'object', '.properties is an object');
-  //ok(props instanceof HTMLPropertiesCollection, '.properties instanceof HTMLPropertiesCollection');
-  equals(typeof props.length, 'number', '.properties.length is a number');
-  equals(typeof props.names, 'object', '.properties.names is an object');
-  //ok(props instanceof DOMStringList, '.properties.names instanceof DOMStringList');
-  equals(typeof props.item, 'function', '.properties.item is a function');
-  equals(typeof props.namedItem, 'function', '.properties.namedItem is a function');
+  test("setup", function(){
+    parent = document.getElementById("parent");
+    item = document.createElement('div');
+    parent.appendChild(item);
+    props = item.properties;
+    names = props.names;
+    propsA = props.namedItem('propA');
+    propsB = props.namedItem('propB');
+    propsX = props.namedItem('propX');
+  });
 
-  // non-item matches nothing
-  verifyItems(props, [], "props");
-  verifyNames(names, [], "names");
-  verifyNamedItems(propsA, [], [], "propsA");
-  verifyNamedItems(propsB, [], [], "propsB");
-  verifyNamedItems(propsX, [], [], "propsX");
+  test("HTMLPropertiesCollection types", function() {
+    equals(typeof props, 'object', '.properties is an object');
+    //ok(props instanceof HTMLPropertiesCollection, '.properties instanceof HTMLPropertiesCollection');
+    equals(typeof props.length, 'number', '.properties.length is a number');
+    equals(typeof props.names, 'object', '.properties.names is an object');
+    //ok(props instanceof DOMStringList, '.properties.names instanceof DOMStringList');
+    equals(typeof props.item, 'function', '.properties.item is a function');
+    equals(typeof props.namedItem, 'function', '.properties.namedItem is a function');
+  });
 
-  // item without any properties
-  item.itemScope = true;
-  verifyItems(props, [], "props");
-  verifyNames(names, [], "names");
-  verifyNamedItems(propsA, [], [], "propsA");
-  verifyNamedItems(propsB, [], [], "propsB");
-  verifyNamedItems(propsX, [], [], "propsX");
+  // <div></div>
 
-  var prop1 = document.createElement('div');
-  prop1.textContent = 'foo';
-  prop1.itemProp = 'propA';
-  item.appendChild(prop1);
-  verifyItems(props, [prop1], "props");
-  verifyNames(names, ['propA'], "names");
-  verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
-  verifyNamedItems(propsB, [], [], "propsB");
-  verifyNamedItems(propsX, [], [], "propsX");
+  test("non-item matches nothing", function() {
+    verifyItems(props, [], "props");
+    verifyNames(names, [], "names");
+    verifyNamedItems(propsA, [], [], "propsA");
+    verifyNamedItems(propsB, [], [], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+  });
 
-  // prop2 not descendent of item
-  var prop2 = document.createElement('div');
-  prop2.textContent = 'bar';
-  prop2.itemProp = 'propB';
-  parent.appendChild(prop2);
-  verifyItems(props, [prop1], "props");
-  verifyNames(names, ['propA'], "names");
-  verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
-  verifyNamedItems(propsB, [], [], "propsB");
-  verifyNamedItems(propsX, [], [], "propsX");
+  // <div itemscope></div>
 
-  // include prop2 via itemref
-  prop2.id = 'id2';
-  item.itemRef = 'id2';
-  verifyItems(props, [prop1, prop2], "props");
-  verifyNames(names, ['propA', 'propB'], "names");
-  verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
-  verifyNamedItems(propsB, [prop2], ['bar'], "propsB");
-  verifyNamedItems(propsX, [], [], "propsX");
+  test("item without any properties", function() {
+    item.itemScope = true;
 
-  // redundant itemref
-  item.itemRef += ' id2';
-  verifyItems(props, [prop1, prop2], "props");
-  verifyNames(names, ['propA', 'propB'], "names");
-  verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
-  verifyNamedItems(propsB, [prop2], ['bar'], "propsB");
-  verifyNamedItems(propsX, [], [], "propsX");
+    verifyItems(props, [], "props");
+    verifyNames(names, [], "names");
+    verifyNamedItems(propsA, [], [], "propsA");
+    verifyNamedItems(propsB, [], [], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+  });
 
-  // nested property in itemref'd tree
-  var prop3 = document.createElement('div');
-  prop3.textContent = 'baz';
-  prop3.id ='id3';
-  prop3.itemProp = 'propC';
-  prop2.appendChild(prop3);
-  item.itemRef += ' id3';
-  verifyItems(props, [prop1, prop2, prop3], "props");
-  verifyNames(names, ['propA', 'propB', 'propC'], "names");
-  verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
-  verifyNamedItems(propsB, [prop2], ['barbaz'], "propsB");
-  verifyNamedItems(propsX, [], [], "propsX");
+  // <div itemscope>
+  //   <div itemprop="propA">foo</div>
+  // </div>
 
-  // children of itemscope'd candidate element not included even if
-  // itemref'd
-  var prop4 = document.createElement('div');
-  prop4.id = 'id4';
-  prop4.itemProp = 'propA';
-  prop4.itemScope = true;
-  item.appendChild(prop4);
-  var prop5 = document.createElement('div');
-  prop5.id = 'id5';
-  prop5.itemProp = 'propB';
-  prop4.appendChild(prop5);
-  item.itemRef += ' id5';
-  verifyItems(props, [prop1, prop4, prop2, prop3], "props");
-  verifyNames(names, ['propA', 'propB', 'propC'], "names");
-  verifyNamedItems(propsA, [prop1, prop4], ['foo', prop4], "propsA");
-  verifyNamedItems(propsB, [prop2], ['barbaz'], "propsB");
-  verifyNamedItems(propsX, [], [], "propsX");
+  test("child element adds property", function() {
+    prop1 = document.createElement('div');
+    prop1.textContent = 'foo';
+    prop1.itemProp = 'propA';
+    item.appendChild(prop1);
 
-  // destroy
-  parent.innerHTML = '';
-  verifyItems(props, [], "props");
-  verifyNames(names, [], "names");
-  verifyNamedItems(propsA, [], [], "propsA");
-  verifyNamedItems(propsB, [], [], "propsB");
-  verifyNamedItems(propsX, [], [], "propsX");
-});
+    verifyItems(props, [prop1], "props");
+    verifyNames(names, ['propA'], "names");
+    verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
+    verifyNamedItems(propsB, [], [], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+  });
+
+  // <div itemscope>
+  //   <div itemprop="propA">foo</div>
+  // </div>
+  // <div itemprop="propB">bar</div>
+
+  test("sibling element does not add property",
+  function() {
+    prop2 = document.createElement('div');
+    prop2.textContent = 'bar';
+    prop2.itemProp = 'propB';
+    parent.appendChild(prop2);
+
+    verifyItems(props, [prop1], "props");
+    verifyNames(names, ['propA'], "names");
+    verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
+    verifyNamedItems(propsB, [], [], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+  });
+
+  // <div itemscope itemref="id2">
+  //   <div itemprop="propA">foo</div>
+  // </div>
+  // <div id="id2" itemprop="propB">bar</div>
+
+  test("include sibling via itemref",
+  function() {
+    prop2.id = 'id2';
+    item.itemRef = 'id2';
+
+    verifyItems(props, [prop1, prop2], "props");
+    verifyNames(names, ['propA', 'propB'], "names");
+    verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
+    verifyNamedItems(propsB, [prop2], ['bar'], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+  });
+
+  // <div itemscope itemref="id2 id2">
+  //   <div itemprop="propA">foo</div>
+  // </div>
+  // <div id="id2" itemprop="propB">bar</div>
+
+  test("redundant itemref is ignored", function() {
+    item.itemRef += ' id2';
+
+    verifyItems(props, [prop1, prop2], "props");
+    verifyNames(names, ['propA', 'propB'], "names");
+    verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
+    verifyNamedItems(propsB, [prop2], ['bar'], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+  });
+
+  // <div itemscope itemref="id2 id2 id3">
+  //   <div itemprop="propA">foo</div>
+  // </div>
+  // <div id="id2" itemprop="propB">
+  //   bar
+  //   <div id="id3" itemprop="propC">baz</div>
+  // </div>
+
+  test("child element adds property in of itemref'd element adds property", function() {
+    prop3 = document.createElement('div');
+    prop3.textContent = 'baz';
+    prop3.id ='id3';
+    prop3.itemProp = 'propC';
+    prop2.appendChild(prop3);
+    item.itemRef += ' id3';
+
+    verifyItems(props, [prop1, prop2, prop3], "props");
+    verifyNames(names, ['propA', 'propB', 'propC'], "names");
+    verifyNamedItems(propsA, [prop1], ['foo'], "propsA");
+    verifyNamedItems(propsB, [prop2], ['barbaz'], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+  });
+
+  // <div itemscope itemref="id2 id2 id3">
+  //   <div itemprop="propA" itemscope>
+  //     foo
+  //     <div id="id4" itemprop="propB">spam</div>
+  //   </div>
+  // </div>
+  // <div itemprop="propB" id="id2">
+  //   bar
+  //   <div id="id3" itemprop="propC">baz</div>
+  // </div>
+
+  test("property is made into sub-item", function() {
+    prop1.itemScope = true;
+    subProps = prop1.properties;
+    prop4 = document.createElement('div');
+    prop4.textContent = 'spam';
+    prop4.id = 'id4';
+    prop4.itemProp = 'propB';
+    prop1.appendChild(prop4);
+
+    verifyItems(props, [prop1, prop2, prop3], "props");
+    verifyNames(names, ['propA', 'propB', 'propC'], "names");
+    verifyNamedItems(propsA, [prop1], [prop1], "propsA");
+    verifyNamedItems(propsB, [prop2], ['barbaz'], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+    verifyItems(subProps, [prop4], ['spam'], "subProps");
+  });
+
+  // <div itemscope itemref="id2 id2 id3 id4">
+  //   <div itemprop="propA" itemscope>
+  //     foo
+  //     <div id="id4" itemprop="propB">spam</div>
+  //   </div>
+  // </div>
+  // <div itemprop="propB" id="id2">
+  //   bar
+  //   <div id="id3" itemprop="propC">baz</div>
+  // </div>
+
+  test("sub-item's property is stolen with itemref",
+  function() {
+    item.itemRef += ' id4';
+
+    verifyItems(props, [prop1, prop4, prop2, prop3], "props");
+    verifyNames(names, ['propA', 'propB', 'propC'], "names");
+    verifyNamedItems(propsA, [prop1], [prop1], "propsA");
+    verifyNamedItems(propsB, [prop4, prop2], ['spam', 'barbaz'], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+    verifyItems(subProps, [], [], "subProps");
+  });
+
+  // <div itemscope itemref="id2 id2 id3 id4">
+  //   <div itemprop="propA" itemscope>
+  //     foo
+  //     <div id="id4" itemprop="propB">spam</div>
+  //   </div>
+  // </div>
+
+  test("removing sibling element",
+  function() {
+    parent.removeChild(prop2);
+
+    verifyItems(props, [prop1, prop4], "props");
+    verifyNames(names, ['propA', 'propB'], "names");
+    verifyNamedItems(propsA, [prop1], [prop1], "propsA");
+    verifyNamedItems(propsB, [prop4], ['spam'], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+    verifyItems(subProps, [], [], "subProps");
+  });
+
+  // <div itemscope itemref="">
+  //   <div itemprop="propA" itemscope>
+  //     foo
+  //     <div id="id4" itemprop="propB">spam</div>
+  //   </div>
+  // </div>
+
+  test("removing itemref",
+  function() {
+    item.itemRef = '';
+
+    verifyItems(props, [prop1], "props");
+    verifyNames(names, ['propA'], "names");
+    verifyNamedItems(propsA, [prop1], [prop1], "propsA");
+    verifyNamedItems(propsB, [], [], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+    verifyItems(subProps, [prop4], ['spam'], "subProps");
+  });
+
+  // <div itemscope itemref="">
+  //   <div itemprop="propA" itemscope></div>
+  // </div>
+
+  test("removing child elements",
+  function() {
+    prop1.innerHTML = '';
+
+    verifyItems(props, [prop1], "props");
+    verifyNames(names, ['propA'], "names");
+    verifyNamedItems(propsA, [prop1], [prop1], "propsA");
+    verifyNamedItems(propsB, [], [], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+    verifyItems(subProps, [], [], "subProps");
+  });
+
+  // <div itemscope itemref="">
+  //   <div id="id1" itemprop="propA" itemscope itemref="id1"></div>
+  // </div>
+
+  test("self-reference is ignored",
+  function() {
+    prop1.itemRef = prop1.id = "id1";
+
+    verifyItems(props, [prop1], "props");
+    verifyNames(names, ['propA'], "names");
+    verifyNamedItems(propsA, [prop1], [prop1], "propsA");
+    verifyNamedItems(propsB, [], [], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+    verifyItems(subProps, [], [], "subProps");
+  });
+
+  test("teardown", function() {
+    parent.innerHTML = '';
+    verifyItems(props, [], "props");
+    verifyNames(names, [], "names");
+    verifyNamedItems(propsA, [], [], "propsA");
+    verifyNamedItems(propsB, [], [], "propsB");
+    verifyNamedItems(propsX, [], [], "propsX");
+  });
+})();
