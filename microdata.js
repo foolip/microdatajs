@@ -136,7 +136,7 @@ function reflectString(attr, prop) {
 }
 
 function reflectSettableTokenList(attr, prop) {
-    function getter() {
+    function getProp() {
 	var elem = this;
 	var list = [];
 	list.item = function(index) { return this[index]; };
@@ -148,8 +148,11 @@ function reflectSettableTokenList(attr, prop) {
 	}
 	update();
 
-	list.__defineGetter__('value', function() { return elem.hasAttribute(attr) ? elem.getAttribute(attr) : ''; });
-	list.__defineSetter__('value', function(val) { elem.setAttribute(attr, val); });
+	function getValue() { return elem.hasAttribute(attr) ? elem.getAttribute(attr) : ''; };
+	function setValue(val) { elem.setAttribute(attr, val); };
+	Object.defineProperty(list, 'value', { get: getValue, set: setValue });
+
+	list.toString = getValue;
 
 	function validate(token) {
 	    if (!token)
@@ -208,11 +211,11 @@ function reflectSettableTokenList(attr, prop) {
 	};
 	return list;
     }
-    function setter(val) {
+    function setProp(val) {
 	this.setAttribute(attr, val);
     }
     Object.defineProperty(Element.prototype, prop,
-	{ get: getter, set: setter });
+	{ get: getProp, set: setProp });
 }
 
 reflectBoolean('itemscope', 'itemScope');
