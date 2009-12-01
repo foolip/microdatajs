@@ -451,10 +451,15 @@ function() {
     item = document.createElement('div');
     parent.appendChild(item);
     props = item.properties;
+    ok(props, "item.properties");
     names = props.names;
+    ok(names, "item.properties.names");
     propsA = props.namedItem('propA');
+    ok(propsA, "item.properties.namedItem('propA')");
     propsB = props.namedItem('propB');
+    ok(propsB, "item.properties.namedItem('propB')");
     propsX = props.namedItem('propX');
+    ok(propsX, "item.properties.namedItem('propX')");
   });
 
   test("HTMLPropertiesCollection types", function() {
