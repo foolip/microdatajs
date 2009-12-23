@@ -156,46 +156,56 @@ var prefixMap = {'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
 		 'hcard': 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fmicroformats.org%2Fprofile%2Fhcard%23%3A',
 		 'vevent': 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fmicroformats.org%2Fprofile%2Fhcalendar%23vevent%3A'};
 
-function getTurtle() {
+function getTurtle(pretty) {
+    if (arguments.length < 1)
+	pretty = true;
+
     var triples = getRDF();
 
-    var prefixes = [];
-    for (prefix in prefixMap) {
-	prefixes.push({'name': prefix, 'uri': prefixMap[prefix]});
-    }
+    if (pretty) {
+	var prefixes = [];
+	for (prefix in prefixMap)
+	    prefixes.push({'name': prefix, 'uri': prefixMap[prefix]});
 
-    var body = '';
-    while (triples.length) {
-	var rest = [];
-	var subject = null;
-	var indent = '';
-	triples.forEach(function (t) {
-	    if (subject == null) {
-		var subjstr = t.s.toTurtle()+' ';
-		body += subjstr+t.p.toTurtle(prefixes)+' '+t.o.toTurtle();
-		var indentlen = subjstr.length;
-		if (indentlen > 8)
-		    indent = '\t';
-		else
-		    while (indentlen-- > 0)
-			indent += ' ';
-		subject = t.s;
-	    } else {
-		if (subject.equals(t.s)) {
-		    body += ' ;\n'+indent+t.p.toTurtle(prefixes)+' '+t.o.toTurtle();
+	var body = '';
+	while (triples.length) {
+	    var rest = [];
+	    var subject = null;
+	    var indent = '';
+	    triples.forEach(function (t) {
+		if (subject == null) {
+		    var subjstr = t.s.toTurtle()+' ';
+		    body += subjstr+t.p.toTurtle(prefixes)+' '+t.o.toTurtle();
+		    var indentlen = subjstr.length;
+		    if (indentlen > 8)
+			indent = '\t';
+		    else
+			while (indentlen-- > 0)
+			    indent += ' ';
+		    subject = t.s;
 		} else {
-		    rest.push(t);
+		    if (subject.equals(t.s)) {
+			body += ' ;\n'+indent+t.p.toTurtle(prefixes)+' '+t.o.toTurtle();
+		    } else {
+			rest.push(t);
+		    }
 		}
-	    }
-	});
-	body += ' .\n';
-	triples = rest;
-    }
+	    });
+	    body += ' .\n';
+	    triples = rest;
+	}
 
-    var head = '';
-    prefixes.forEach(function(p) {
-	if (p.used)
-	    head += '@prefix '+p.name+': <'+p.uri+'> .\n';
-    });
-    return head+'\n'+body;
+	var head = '';
+	prefixes.forEach(function(p) {
+	    if (p.used)
+		head += '@prefix '+p.name+': <'+p.uri+'> .\n';
+	});
+	return head+'\n'+body;
+    } else {
+	var body = '';
+	triples.forEach(function (t) {
+	    body += t.s.toTurtle()+' '+t.p.toTurtle()+' '+t.o.toTurtle()+' .\n';
+	});
+	return body;
+    }
 }
