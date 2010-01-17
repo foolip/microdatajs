@@ -1,12 +1,23 @@
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/converting-html-to-other-formats.html#rdf
 function getRDF() {
     function URI(uri) {
-	this.uri = uri;
+	if (uri)
+	    this.uri = uri; // URI node
+	else
+	    this.uri = '_:n'+URI.prototype.blanks++; // blank node
     }
+    URI.prototype.blanks = 0;
+    URI.prototype.isBlank = function() {
+	return this.uri.substr(0, 2) == '_:';
+    };
     URI.prototype.equals = function(other) {
 	return other instanceof URI && this.uri == other.uri;
     };
     URI.prototype.toTurtle = function(prefixes) {
+	// blank nodes
+	if (this.isBlank())
+	    return this.uri;
+	// prefixed notation
 	for (var i=0; prefixes && i<prefixes.length; i++) {
 	    var p = prefixes[i];
 	    if (this.uri.substr(0, p.uri.length) == p.uri) {
@@ -14,6 +25,7 @@ function getRDF() {
 		return p.name+':'+this.uri.substr(p.uri.length);
 	    }
 	}
+	// plain URIs
 	return '<'+this.uri+'>';
     };
     function Literal(string, lang) {
@@ -23,16 +35,6 @@ function getRDF() {
     Literal.prototype.toTurtle = function() {
 	return '"'+this.string.replace(/([\\"])/g, '\\$1').replace(/\r/g, '\\r').replace(/\n/g, '\\n')+'"'+
 	    (this.lang ? ('@'+this.lang) : '');
-    };
-    function Blank() {
-	this.id = Blank.prototype.ids++;
-    }
-    Blank.prototype.ids = 0;
-    Blank.prototype.equals = function(other) {
-	return other instanceof Blank && this.id == other.id;
-    };
-    Blank.prototype.toTurtle = function() {
-	return '_:n'+this.id;
     };
 
     function Triple(s, p, o) {
@@ -100,7 +102,7 @@ function getRDF() {
     // FIXME: blockquote, q
 
     function generateItemTriples(item, type) {
-	var subject = isAbsoluteURL(item.itemId) ? new URI(item.itemId) : new Blank();
+	var subject = isAbsoluteURL(item.itemId) ? new URI(item.itemId) : new URI(/*blank*/);
 	if (isAbsoluteURL(item.itemType)) {
 	    triples.push(new Triple(subject,
 				    new URI('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
