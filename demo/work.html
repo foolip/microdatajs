@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Works demo</title>
+<script src="../microdata.js"></script>
+<script src="../json2.js"></script>
+<script src="../rdf.js"></script>
+<script>
+window.onload = function() {
+  var pre = document.createElement('pre');
+  pre.setAttribute('style', 'border-left: 2px solid #999; margin-left:1em; padding-left:1em');
+  document.body.appendChild(pre);
+  pre.textContent = getTurtle();
+}
+</script>
+<link rel="stylesheet" href="stylesheet.js">
+</head>
+
+<body>
+
+<figure itemscope itemtype="http://n.whatwg.org/work">
+  <a itemprop="work" href="http://commons.wikimedia.org/wiki/File:Waterfall_at_the_Polynesian.jpg">
+    <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Waterfall_at_the_Polynesian.jpg/400px-Waterfall_at_the_Polynesian.jpg">
+  </a>
+  <p><cite itemprop="title">Waterfall at the Polynesian</cite></p>
+  <p><small>Taken by <span itemprop="author">Benjamin D. Esham</span>.
+  Licensed under the <a itemprop="license"
+  href="http://creativecommons.org/licenses/by-sa/3.0/us/">Creative
+  Commons Attribution-Share Alike 3.0 United States License</a>.
+  </small></p>
+</figure>
+
+</body>
+
+</html>
