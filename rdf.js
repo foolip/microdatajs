@@ -1,9 +1,3 @@
-NodeList.prototype.forEach = function(callback) {
-    for (var i = 0; i < this.length; i++) {
-	callback(this.item(i));
-    }
-};
-
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/converting-html-to-other-formats.html#rdf
 function getRDF() {
     function URI(uri) {
@@ -88,8 +82,9 @@ function getRDF() {
     }
 */
 
-    document.getElementsByTagName('meta').forEach(
-    function(meta) {
+    var metas = document.getElementsByTagName('meta');
+    for (var metaIndex = 0; metaIndex < metas.length; metaIndex++) {
+	var meta = metas[metaIndex];
 	if (meta.hasAttribute('name') && meta.hasAttribute('content')) {
 	    var subject = new URI(document.location.href);
 	    var object = new Literal(meta.content, getLang(meta));
@@ -100,8 +95,8 @@ function getRDF() {
 	    else if (isAbsoluteURL(meta.name))
 		triples.push(new Triple(subject, new URI(meta.name), object));
 	}
-    });
-    
+    }
+
     // FIXME: blockquote, q
 
     function generateItemTriples(item, type) {
