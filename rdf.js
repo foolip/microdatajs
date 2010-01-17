@@ -144,7 +144,31 @@ function getRDF() {
 			   generateItemTriples(items[i]));
 	triples.push(t);
     }
-    return triples;
+
+    // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#conversion-to-rdf
+    function rewriteWorks(t) {
+	switch (t.p.uri) {
+	case 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3Awork':
+	    if (t.s.isBlank()) {
+		// rewrite the subject and drop this triple
+		t.s.uri = t.o.uri;
+		return false;
+	    }
+	    break;
+	case 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3Atitle':
+	    t.p.uri = 'http://purl.org/dc/elements/1.1/title';
+	    break;
+	case 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3Aauthor':
+	    t.p.uri = 'http://creativecommons.org/ns#attributionName';
+	    break;
+	case 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3Alicense':
+	    t.p.uri = 'http://www.w3.org/1999/xhtml/vocab#license';
+	    break;
+	}
+	return true;
+    }
+
+    return triples.filter(rewriteWorks);
 }
 
 var prefixMap = {'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
