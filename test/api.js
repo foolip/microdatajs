@@ -76,7 +76,7 @@ function verifyTokenList(list, value, allItems, notContainItems) {
   equals(stringified, value, 'token list stringifies to underlying value');
 }
 
-test(".itemProp reflects @itemprop (DOMSettableTokenList)", 
+test(".itemProp reflects @itemprop (DOMSettableTokenList)",
 function() {
   // content attribute -> DOMSettableTokenList
   var elm = document.createElement('div');

@@ -23,7 +23,7 @@ function getRDF() {
 	return '<'+this.uri+'>';
     };
     function Literal(string, lang) {
-	this.string = string; 
+	this.string = string;
 	this.lang = lang;
     }
     Literal.prototype.toTurtle = function() {
