@@ -135,6 +135,18 @@ function reflectString(attr, prop) {
 	  set: function (val) { this.setAttribute(attr, val); }});
 }
 
+function reflectURL(attr, prop) {
+    Object.defineProperty(Element.prototype, prop,
+	{ get: function () {
+	      // use temporary <link> to resolve URL
+	      var url = this.getAttribute(attr) || "";
+	      var link = document.createElement('link');
+	      link.href = url;
+	      return link.href;
+	  },
+	  set: function (val) { this.setAttribute(attr, val); }});
+}
+
 function reflectSettableTokenList(attr, prop) {
     function getProp() {
 	var elem = this;
@@ -219,10 +231,8 @@ function reflectSettableTokenList(attr, prop) {
 }
 
 reflectBoolean('itemscope', 'itemScope');
-// FIXME: should be URL?
 reflectString('itemtype', 'itemType');
-// FIXME: should be URL?
-reflectString('itemid', 'itemId');
+reflectURL('itemid', 'itemId');
 reflectSettableTokenList('itemprop', 'itemProp');
 // FIXME: should also be DOMSettableTokenList?
 reflectString('itemref', 'itemRef');

@@ -21,7 +21,12 @@ function testBoolReflection(tag, attr, prop) {
   ok(!elm.hasAttribute(attr), '.'+prop+'=false');
 }
 
-function testStringReflection(elm, attr, prop, str) {
+function testStringReflection(elm, attr, prop, attrString, propString) {
+  // attrString is the content attribute value, while propString is
+  // the expected value when getting the property (if given)
+  if (typeof propString == 'undefined')
+    propString = attrString;
+
   if (typeof elm == 'string')
     elm = document.createElement(elm);
 
@@ -29,18 +34,29 @@ function testStringReflection(elm, attr, prop, str) {
 
   // reflect content attribute -> DOM property
   equals(elm[prop], '', 'no @'+attr);
-  elm.setAttribute(attr, str);
-  equals(elm[prop], str, 'setting @'+attr);
+  elm.setAttribute(attr, attrString);
+  equals(elm[prop], propString, 'setting @'+attr);
   elm.removeAttribute(attr);
   equals(elm[prop], '', 'removing @'+attr);
 
   // reflect DOM property -> content attribute
   elm[prop] = '';
   equals(elm.getAttribute(attr), '', 'setting .'+prop+'=""');
-  elm[prop] = str;
-  equals(elm.getAttribute(attr), str, 'setting .'+prop+'="'+str+'"');
+  elm[prop] = attrString;
+  equals(elm.getAttribute(attr), attrString, 'setting .'+prop+'="'+attrString+'"');
   //delete elm[prop];
   //ok(!elm.hasAttribute(attr), 'deleting .'+prop);
+}
+
+function testURLReflection(elm, attr, prop, url) {
+  // like string reflection except getting resolves URLs
+  var resolved;
+  if (url.indexOf(':') == -1)
+      resolved = window.location.href + url;
+  else
+      resolved = url;
+
+  testStringReflection(elm, attr, prop, url, resolved);
 }
 
 function testItemValueReflection(tag, attr, str) {
@@ -55,10 +71,12 @@ test(".itemScope reflects @itemscope", function() {
 
 test(".itemType reflects @itemtype", function() {
   testStringReflection('span', 'itemtype', 'itemType', 'http://example.com/vocab#thing');
+  testStringReflection('span', 'itemtype', 'itemType', '#thing');
 });
 
 test(".itemId reflects @itemid", function() {
-  testStringReflection('span', 'itemid', 'itemId', 'http://example.com/item');
+  testURLReflection('span', 'itemid', 'itemId', 'http://example.com/item');
+  testURLReflection('span', 'itemid', 'itemId', 'item');
 });
 
 function verifyTokenList(list, value, allItems, notContainItems) {
