@@ -5,6 +5,8 @@
 <script src="../microdata.js"></script>
 <script>
 function getCalendar(node) {
+  // This function assumes the content is valid.
+  // It is not a compliant implementation of the algorithm for extracting vEvent data.
   while (node && (!node.itemScope || !node.itemType == 'http://microformats.org/profile/hcalendar#vevent'))
     node = node.parentNode;
   if (!node) {
@@ -23,7 +25,7 @@ function getCalendar(node) {
     var parameters = '';
     if (prop.localName == 'time') {
       value = value.replace(/[:-]/g, '');
-      if (prop.date && prop.time)
+      if (value.match(/T/))
         parameters = ';VALUE=DATE';
       else
         parameters = ';VALUE=DATE-TIME';
@@ -35,7 +37,7 @@ function getCalendar(node) {
     }
     for (var nameIndex = 0; nameIndex < prop.itemProp.length; nameIndex += 1) {
       var name = prop.itemProp[nameIndex];
-      if (!name.match(':') && !name.match('\\.'))
+      if (!name.match(/:/) && !name.match(/\./))
         calendar += name.toUpperCase() + parameters + ':' + value + '\r\n';
     }
   }
