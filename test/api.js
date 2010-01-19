@@ -59,62 +59,36 @@ function testURLReflection(elm, attr, prop, url) {
   testStringReflection(elm, attr, prop, url, resolved);
 }
 
-function testItemValueReflection(tag, attr, str) {
+function testDOMSettableTokenListReflection(tag, attr, prop) {
   var elm = document.createElement(tag);
-  elm.setAttribute('itemprop', '');
-  testStringReflection(elm, attr, 'itemValue', str);
-}
+  var list = elm[prop];
 
-test(".itemScope reflects @itemscope", function() {
-  testBoolReflection('span', 'itemscope', 'itemScope');
-});
-
-test(".itemType reflects @itemtype", function() {
-  testStringReflection('span', 'itemtype', 'itemType', 'http://example.com/vocab#thing');
-  testStringReflection('span', 'itemtype', 'itemType', '#thing');
-});
-
-test(".itemId reflects @itemid", function() {
-  testURLReflection('span', 'itemid', 'itemId', 'http://example.com/item');
-  testURLReflection('span', 'itemid', 'itemId', 'item');
-});
-
-function verifyTokenList(list, value, allItems, notContainItems) {
-  equals(list.value, value, 'token list .value'+value);
-  equals(list.length, allItems.length, 'token list length');
-  for (var i=0; i < list.length && i < allItems.length; i++) {
-    equals(list.item(i), allItems[i], 'token list .item() getter');
-    equals(list[i], allItems[i], 'token list [] getter');
-    ok(list.contains(allItems[i]), 'token list contains '+allItems[i]);
-  }
-  for (i=0; i<notContainItems.length; i++) {
-    ok(!list.contains(notContainItems[i]), 'token list does not contain '+notContainItems[i]);
-  }
-  var stringified = ''+list;
-  equals(stringified, value, 'token list stringifies to underlying value');
-}
-
-test(".itemProp reflects @itemprop (DOMSettableTokenList)",
-function() {
   // content attribute -> DOMSettableTokenList
-  var elm = document.createElement('div');
-  var list = elm.itemProp;
-  verifyTokenList(list, '', [], ['a', 'b']);
-
-  elm.setAttribute('itemprop', ' ');
-  verifyTokenList(list, ' ', [], ['a', 'b']);
-
-  elm.setAttribute('itemprop', ' a');
-  verifyTokenList(list, ' a', ['a'], ['b']);
-
-  elm.setAttribute('itemprop', 'a  b ');
-  verifyTokenList(list, 'a  b ', ['a', 'b'], []);
-
-  elm.setAttribute('itemprop', 'a  b b');
-  verifyTokenList(list, 'a  b b', ['a', 'b', 'b'], []);
-
-  elm.removeAttribute('itemprop');
-  verifyTokenList(list, '', [], ['a', 'b']);
+  function verifyTokenList(value, allItems, notContainItems) {
+    equals(list.value, value, 'token list .value'+value);
+    equals(list.length, allItems.length, 'token list length');
+    for (var i=0; i < list.length && i < allItems.length; i++) {
+      equals(list.item(i), allItems[i], 'token list .item() getter');
+      equals(list[i], allItems[i], 'token list [] getter');
+      ok(list.contains(allItems[i]), 'token list contains '+allItems[i]);
+    }
+    for (i=0; i<notContainItems.length; i++) {
+      ok(!list.contains(notContainItems[i]), 'token list does not contain '+notContainItems[i]);
+    }
+    var stringified = ''+list;
+    equals(stringified, value, 'token list stringifies to underlying value');
+  }
+  verifyTokenList('', [], ['a', 'b']);
+  elm.setAttribute(attr, ' ');
+  verifyTokenList(' ', [], ['a', 'b']);
+  elm.setAttribute(attr, ' a');
+  verifyTokenList(' a', ['a'], ['b']);
+  elm.setAttribute(attr, 'a  b ');
+  verifyTokenList('a  b ', ['a', 'b'], []);
+  elm.setAttribute(attr, 'a  b b');
+  verifyTokenList('a  b b', ['a', 'b', 'b'], []);
+  elm.removeAttribute(attr);
+  verifyTokenList('', [], ['a', 'b']);
 
   // DOMSettableTokenList.add()
   function testAdd(before, token, after) {
@@ -183,36 +157,63 @@ function() {
   }
   testToggle('', 'a', 'a', true);
   testToggle('a', 'a', '', false);
-});
+}
 
-var throwMethods = ['contains', 'add', 'remove', 'toggle'];
-
-test("DOMSettableTokenList access with empty token throws SYNTAX_ERR", function() {
+function testDOMSettableTokenListExceptions(tag, prop) {
+  var throwMethods = ['contains', 'add', 'remove', 'toggle'];
   for (var i=0; i<throwMethods.length; i++) {
-    var elm = document.createElement('div');
+    var elm = document.createElement(tag);
+    // access with empty token throws SYNTAX_ERR
     try {
-      elm.itemProp[throwMethods[i]]('');
+      elm[prop][throwMethods[i]]('');
     } catch (e) {
       equals(e.code, 12, throwMethods[i]);
     }
-  }
-  expect(throwMethods.length);
-});
-
-test("DOMSettableTokenList access with whitespace token throws INVALID_CHARACTER_ERR", function() {
-  for (var i=0; i<throwMethods.length; i++) {
-    var elm = document.createElement('div');
+    // access with whitespace token throws INVALID_CHARACTER_ERR
     try {
-      elm.itemProp[throwMethods[i]](' ');
+      elm[prop][throwMethods[i]](' ');
     } catch (e) {
       equals(e.code, 5, throwMethods[i]);
     }
   }
-  expect(throwMethods.length);
+  expect(2*throwMethods.length);
+}
+
+function testItemValueReflection(tag, attr, str) {
+  var elm = document.createElement(tag);
+  elm.setAttribute('itemprop', '');
+  testStringReflection(elm, attr, 'itemValue', str);
+}
+
+test(".itemScope reflects @itemscope", function() {
+  testBoolReflection('span', 'itemscope', 'itemScope');
+});
+
+test(".itemType reflects @itemtype", function() {
+  testStringReflection('span', 'itemtype', 'itemType', 'http://example.com/vocab#thing');
+  testStringReflection('span', 'itemtype', 'itemType', '#thing');
+});
+
+test(".itemId reflects @itemid", function() {
+  testURLReflection('span', 'itemid', 'itemId', 'http://example.com/item');
+  testURLReflection('span', 'itemid', 'itemId', 'item');
+});
+
+test(".itemProp reflects @itemprop (DOMSettableTokenList)",
+function() {
+  testDOMSettableTokenListReflection('span', 'itemprop', 'itemProp');
+});
+
+test(".itemProp exceptions (DOMSettableTokenList)", function() {
+  testDOMSettableTokenListExceptions('span', 'itemProp');
 });
 
 test(".itemRef reflects @itemref", function() {
-  testStringReflection('span', 'itemref', 'itemRef', 'id1 id2');
+  testDOMSettableTokenListReflection('span', 'itemref', 'itemRef');
+});
+
+test(".itemRef exceptions (DOMSettableTokenList)", function() {
+  testDOMSettableTokenListExceptions('span', 'itemRef');
 });
 
 test(".itemValue without @itemprop", function() {

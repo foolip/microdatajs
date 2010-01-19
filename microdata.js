@@ -234,8 +234,7 @@ reflectBoolean('itemscope', 'itemScope');
 reflectString('itemtype', 'itemType');
 reflectURL('itemid', 'itemId');
 reflectSettableTokenList('itemprop', 'itemProp');
-// FIXME: should also be DOMSettableTokenList?
-reflectString('itemref', 'itemRef');
+reflectSettableTokenList('itemref', 'itemRef');
 // FIXME: only if not browser-implemented
 reflectString('datetime', 'dateTime');
 
