@@ -138,8 +138,10 @@ function reflectString(attr, prop) {
 function reflectURL(attr, prop) {
     Object.defineProperty(Element.prototype, prop,
 	{ get: function () {
+	      if (!this.hasAttribute(attr))
+		  return '';
 	      // use temporary <link> to resolve URL
-	      var url = this.getAttribute(attr) || "";
+	      var url = this.getAttribute(attr);
 	      var link = document.createElement('link');
 	      link.href = url;
 	      return link.href;
