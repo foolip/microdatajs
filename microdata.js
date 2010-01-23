@@ -86,18 +86,6 @@ function fakeCollection(rootElem, incFilter, recFilter) {
 	afterUpdate();
     }
 
-    // keep collection up to date if possible
-    if (rootElem.addEventListener) {
-	rootElem.addEventListener('DOMAttrModified', updateHandler, false);
-	rootElem.addEventListener('DOMNodeInserted', updateHandler, false);
-	rootElem.addEventListener('DOMNodeRemoved',
-	    function(ev) {
-		update(function(e){return e != ev.target && incFilter(e);},
-		       function(e){return e != ev.target;});
-		afterUpdate();
-	    }, false);
-    }
-
     updateSimple();
 
     return elems;
@@ -179,8 +167,6 @@ function reflectSettableTokenList(attr, prop) {
 	    validate(token);
 	    return inList(token, this);
 	};
-	if (elem.addEventListener)
-	    elem.addEventListener('DOMAttrModified', update, false);
 	list.add = function(token) {
 	    validate(token);
 	    if (!inList(token, this)) {
@@ -378,16 +364,6 @@ function() {
 	updateNames();
 	for (name in pnlCache)
 	    updatePropertyNodeList(pnlCache[name], name);
-    }
-
-    // keep collection up to date if possible
-    if (document.documentElement.addEventListener) {
-	document.documentElement.addEventListener('DOMAttrModified', updateHandler, false);
-	document.documentElement.addEventListener('DOMNodeInserted', updateHandler, false);
-	document.documentElement.addEventListener('DOMNodeRemoved',
-	    function(ev) {
-		updateHandler(function(e){return (e != ev.target) && !contains(ev.target, e);});
-	    }, false);
     }
 
     updateHandler();
