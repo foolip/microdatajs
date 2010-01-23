@@ -9,8 +9,8 @@ function downloadIt($appendee, mime, data) {
   $appendee.append($('<a class="download" href="data:'+mime+','+encodeURI(data)+'">Download it!</a>'));
 }
 
-function noItems($appendee, name, itemprop, spec) {
-  $appendee.append($('<i>No <a href="'+spec+'">'+name+'</a> items (items with <code>itemprop="'+itemprop+'"</code>)</i>'));
+function noItems($appendee, name, itemtype, spec) {
+  $appendee.append($('<i>No <a href="'+spec+'">'+name+'</a> items (items with <code>itemtype="'+itemtype+'"</code>)</i>'));
 }
 
 function updateTab(index) {
