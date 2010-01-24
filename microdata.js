@@ -293,7 +293,7 @@ function() {
 		scope = scope.parentNode;
 	    return scope;
 	}
-	var refIds = splitTokens(root.itemRef);
+	var refIds = root.itemRef;
 	idloop: for (var i=0; i<refIds.length; i++) {
 	    var candidate = document.getElementById(refIds[i]);
 	    if (!candidate || !elemFilter(candidate))
