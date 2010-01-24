@@ -145,39 +145,33 @@ function getRDF() {
 	triples.push(t);
     }
 
-    // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#conversion-to-rdf
-    function rewriteWorks(t) {
-	switch (t.p.uri) {
-	case 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3Awork':
-	    if (t.s.isBlank()) {
-		// rewrite the subject and drop this triple
-		t.s.uri = t.o.uri;
-		return false;
-	    }
-	    break;
-	case 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3Atitle':
-	    t.p.uri = 'http://purl.org/dc/elements/1.1/title';
-	    break;
-	case 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3Aauthor':
-	    t.p.uri = 'http://creativecommons.org/ns#attributionName';
-	    break;
-	case 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3Alicense':
-	    t.p.uri = 'http://www.w3.org/1999/xhtml/vocab#license';
-	    break;
-	}
-	return true;
+    if (document.getItems('http://n.whatwg.org/work').length > 0) {
+	triples.push(new Triple(new URI('http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3Awork'),
+				new URI('http://www.w3.org/2002/07/owl#equivalentProperty'),
+				new URI('http://www.w3.org/2002/07/owl#sameAs')));
+	triples.push(new Triple(new URI('http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3Atitle'),
+				new URI('http://www.w3.org/2002/07/owl#equivalentProperty'),
+				new URI('http://purl.org/dc/elements/1.1/title')));
+	triples.push(new Triple(new URI('http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3Aauthor'),
+				new URI('http://www.w3.org/2002/07/owl#equivalentProperty'),
+				new URI('http://creativecommons.org/ns#attributionName')));
+	triples.push(new Triple(new URI('http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3Alicense'),
+				new URI('http://www.w3.org/2002/07/owl#equivalentProperty'),
+				new URI('http://www.w3.org/1999/xhtml/vocab#license')));
     }
 
-    return triples.filter(rewriteWorks);
+    return triples;
 }
 
 var prefixMap = {'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+		 'owl': 'http://www.w3.org/2002/07/owl#',
 		 'xhv': 'http://www.w3.org/1999/xhtml/vocab#',
 		 'dc': 'http://purl.org/dc/elements/1.1/',
-		 'dcterms': 'http://purl.org/dc/terms/',
+		 'dct': 'http://purl.org/dc/terms/',
 		 'cc': 'http://creativecommons.org/ns#',
 		 'hcard': 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fmicroformats.org%2Fprofile%2Fhcard%23%3A',
-		 'vevent': 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fmicroformats.org%2Fprofile%2Fhcalendar%23vevent%3A'};
+		 'vevent': 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fmicroformats.org%2Fprofile%2Fhcalendar%23vevent%3A',
+		 'work': 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3A'};
 
 function getTurtle(pretty) {
     if (arguments.length < 1)
@@ -197,8 +191,8 @@ function getTurtle(pretty) {
 	    var indent = '';
 	    triples.forEach(function (t) {
 		if (subject == null) {
-		    var subjstr = t.s.toTurtle()+' ';
-		    body += subjstr+t.p.toTurtle(prefixes)+' '+t.o.toTurtle();
+		    var subjstr = t.s.toTurtle(prefixes)+' ';
+		    body += subjstr+t.p.toTurtle(prefixes)+' '+t.o.toTurtle(prefixes);
 		    var indentlen = subjstr.length;
 		    if (indentlen > 8)
 			indent = '\t';
@@ -208,7 +202,7 @@ function getTurtle(pretty) {
 		    subject = t.s;
 		} else {
 		    if (subject.equals(t.s)) {
-			body += ' ;\n'+indent+t.p.toTurtle(prefixes)+' '+t.o.toTurtle();
+			body += ' ;\n'+indent+t.p.toTurtle(prefixes)+' '+t.o.toTurtle(prefixes);
 		    } else {
 			rest.push(t);
 		    }
