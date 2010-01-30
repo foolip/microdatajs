@@ -267,59 +267,93 @@ function() {
     var itemElem = this;
 
     var props = [];
-    function updateProperties(elemFilter) {
-	var root = itemElem;
 
-	props.length = 0;
-
-	// when the root isn't a item in the document, match nothing
-	// FIXME: the spec doesn't actually say this.
-	if (!root.itemScope || !contains(document.documentElement, root))
-	    return;
-
+    function collectElements(root) {
+	// Let results and pending be empty lists of elements.
+	var results = [];
 	var pending = [];
+
 	function pushChildren(e) {
-	    for (var child = e.lastChild; child; child = child.previousSibling) {
-		if (child.nodeType == 1 && elemFilter(child)) {
+	    //for (var child = e.lastChild; child; child = child.previousSibling) {
+	    for (var child = e.firstChild; child; child = child.nextSibling) {
+		if (child.nodeType == 1) {
 		    pending.push(child);
 		}
 	    }
 	}
+
+	// Add all the children elements of root to pending.
 	pushChildren(root);
 
-	function getScopeNode(e) {
-	    var scope = e.parentNode;
-	    while (scope && !scope.itemScope)
-		scope = scope.parentNode;
-	    return scope;
+	// If root has an itemref attribute...
+	var idrefs = root.itemRef;
+        for (var i=0; i<idrefs.length; i++) {
+	    // FIXME: look in home tree, not document
+	    var refElm = document.getElementById(idrefs[i]);
+	    if (refElm)
+		pending.push(refElm);
 	}
-	var refIds = root.itemRef;
-	idloop: for (var i=0; i<refIds.length; i++) {
-	    var candidate = document.getElementById(refIds[i]);
-	    if (!candidate || !elemFilter(candidate))
-		continue;
-	    var scope = getScopeNode(candidate);
-	    for (var j=0; j<pending.length; j++) {
-		if (candidate == pending[j])
-		    continue idloop;
-		if (contains(pending[j], candidate) &&
-		    (pending[j] == scope ||
-		     getScopeNode(pending[j]) == scope))
-		    continue idloop;
+
+	// Loop...
+	var current;
+	while ((current = pending.pop())) {
+	    results.push(current);
+	    if (!current.itemScope)
+		pushChildren(current);
+	}
+
+	return results;
+    }
+
+    function crawlProperties(root, memory) {
+	if (inList(root, memory)) {
+	    alert('FAIL: root in memory');
+	    return undefined;
+	}
+
+	var results = collectElements(root);
+
+	if (inList(root, results)) {
+	    alert('FAIL: root in results');
+	    return undefined;
+	}
+
+	// If any elements are listed in results more than once, then
+	// the algorithm fails; abort these steps.
+	for (var i=0; i<results.length; i++) {
+	    for (var j=0; j<results.length; j++) {
+		if (i != j && results[i] == results[j]) {
+		    alert('FAIL: duplicate element');
+		    return undefined;
+		}
 	    }
-	    pending.push(candidate);
+	}
+
+	results = results.filter(function(e){return e.hasAttribute('itemprop');});
+
+	var newMemory = memory.concat([root]);
+
+	for (i=0; i<results.length; i++) {
+	    if (results[i].hasAttribute('itemscope')) {
+		var subResults = crawlProperties(results[i], newMemory);
+		if (typeof subResults == 'undefined') {
+		    alert('FAIL: recursive crawl failed');
+		    return undefined;
+		}
+	    }
 	}
 
 	// from http://www.quirksmode.org/dom/getElementsByTagNames.html
-	pending.sort(function (a,b){return (a.compareDocumentPosition(b)&6)-3;});
+	results.sort(function (a,b){return 3-(a.compareDocumentPosition(b)&6);});
 
-	while (pending.length) {
-	    var current = pending.pop();
-	    if (current.hasAttribute('itemprop'))
-		props.push(current);
-	    if (!current.hasAttribute('itemscope'))
-		pushChildren(current);
-	}
+	return results;
+    }
+
+    function updateProperties(elemFilter) {
+	props.length = 0;
+	var results = crawlProperties(itemElem, []);
+	if (results)
+	    props.push.apply(props, results);
     }
 
     props.names = [];
