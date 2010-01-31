@@ -27,14 +27,14 @@ test('jQuery.fn.properties', function() {
   }
   t('#testdata', []);
   t('#w', ['w0', 'w1', 'w2', 'w3']);
-  t('#x', []);
-  t('#loops', []);
+  t('#x', ['w2', 'w3', 'x0', 'x1']);
+  t('#loops', ['plain', 'loop0','loop1', 'loop2', 'loop3', 'loop4']);
   t('#loop0', []);
-  t('#loop1', []);
+  t('#loop1', ['loop2']);
   t('#loop2', []);
   t('#loop3', []);
   t('#loop4', []);
-  t('#ioItem', []);
+  t('#ioItem', ['ioBefore', 'ioChild', 'ioAfter']);
 });
 
 function testStringReflection($elm, attr, func, attrString, funcString) {

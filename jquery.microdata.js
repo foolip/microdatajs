@@ -189,86 +189,69 @@
     }
   }
 
-  function properties() {
-    function collectElements(root) {
-      // Let results and pending be empty lists of elements.
-      var results = [];
-      var pending = [];
-
-      function pushChildren(elm) {
-        pending.push.apply(pending, jQuery(elm).children().toArray());
+  function properties(name) {
+    var props = [];
+    // visitItem adds properties or checks for itemref loops,
+    // depending on if a stack of visited items is given.
+    function visitItem(item, visited) {
+      // traverse tree for property nodes
+      function traverse(node) {
+        var $node = jQuery(node);
+        var $names = $node.itemProp();
+        if ($names.length > 0) {
+          // this is a property node
+          if (visited) {
+            // only look for itemref loops; don't add properties
+            if ($node.itemScope()) {
+              switch (jQuery.inArray(node, visited)) {
+              case -1:
+                // no loop (yet)
+                visitItem(node, visited.concat([node]));
+                break;
+              case 0:
+                // self-referring item/property
+                throw prop;
+              }
+            }
+          } else {
+            // add property if name matches and it is not self-referring
+            if (!name || jQuery.inArray(name, $names.toArray()) != -1) {
+              if ($node.itemScope()) {
+                try {
+                  visitItem(node, [item]);
+                } catch (ex) {
+                  // skip this self-referring property
+                  return;
+                }
+              }
+              props.push(node);
+            }
+          }
+        }
+        // don't traverse into subitems
+        if (!$node.itemScope()) {
+          $node.children().each(function() {
+            traverse(this);
+          });
+        }
       }
-
-      // Add all the children elements of root to pending.
-      pushChildren(root);
-
-      // If root has an itemref attribute...
-      // FIXME: itemRef() hides duplicate IDs
-      jQuery(root).itemRef().each(function(i, id) {
-        // FIXME: look in home tree, not document
+      var $item = jQuery(item);
+      $item.children().each(function() {
+        traverse(this);
+      });
+      $item.itemRef().each(function(i, id) {
         var $ref = jQuery('#'+id);
-        if ($ref.get(0))
-          pending.push($ref.get(0));
+        if ($ref.length == 1)
+          traverse($ref.get(0));
       });
-
-      // Loop...
-      var current;
-      while ((current = pending.pop())) {
-        results.push(current);
-        if (!jQuery(current).itemScope())
-          pushChildren(current);
-      }
-
-      return results;
     }
 
-    function crawlProperties(root, memory) {
-      if (jQuery.inArray(root, memory) != -1) {
-        //alert('FAIL: root in memory');
-        return undefined;
-      }
-
-      var results = collectElements(root);
-
-      if (jQuery.inArray(root, results) != -1) {
-        //alert('FAIL: root in results');
-        return undefined;
-      }
-
-      // If any elements are listed in results more than once, then
-      // the algorithm fails; abort these steps.
-      for (var i=0; i<results.length; i++) {
-        for (var j=0; j<results.length; j++) {
-          if (i != j && results[i] == results[j]) {
-            //alert('FAIL: duplicate element');
-            return undefined;
-          }
-        }
-      }
-
-      results = jQuery.grep(results, function(elm) {
-        return jQuery(elm).itemProp();
-      });
-
-      var newMemory = memory.concat([root]);
-
-      for (i=0; i<results.length; i++) {
-        if (results[i].hasAttribute('itemscope')) {
-          var subResults = crawlProperties(results[i], newMemory);
-          if (subResults == undefined) {
-            //alert('FAIL: recursive crawl failed');
-            return undefined;
-          }
-        }
-      }
-
-      // from http://www.quirksmode.org/dom/getElementsByTagNames.html
-      results.sort(function (a,b){return 3-(a.compareDocumentPosition(b)&6);});
-
-      return results;
-    }
-
-    return jQuery(crawlProperties(this.get(0), []));
+    this.each(function(i, node) {
+      if (jQuery(node).itemScope())
+        visitItem(node);
+    });
+    // make results unique and sorted in document order
+    return jQuery(jQuery.unique(props));
   }
 
   jQuery.fn.extend({
