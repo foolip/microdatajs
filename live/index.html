@@ -13,15 +13,15 @@ document.createElement('figcaption');
 document.createElement('section');
 document.createElement('time');
 </script>
-<script src="js/jquery-1.3.2.min.js"></script>
-<script src="js/jquery-ui-1.7.2.custom.min.js"></script>
-<script src="js/jquery.textarearesizer.compressed.js"></script>
-<script src="../microdata.js"></script>
-<script src="json2.js"></script>
-<script src="../microdata.json.js"></script>
-<script src="../microdata.rdf.js"></script>
-<script src="../microdata.vcard.js"></script>
-<script src="../microdata.vevent.js"></script>
+<script src="../lib/jquery-1.4.1.min.js"></script>
+<script src="../lib/jquery-ui-1.7.2.custom.min.js"></script>
+<script src="../lib/jquery.textarearesizer.compressed.js"></script>
+<script src="../lib/json2.js"></script>
+<script src="../jquery.microdata.js"></script>
+<script src="../jquery.microdata.json.js"></script>
+<script src="../jquery.microdata.rdf.js"></script>
+<script src="../jquery.microdata.vcard.js"></script>
+<script src="../jquery.microdata.vevent.js"></script>
 <script src="live.js"></script>
 </head>
 <body>
@@ -33,6 +33,7 @@ Examples:
 <select title="Select an example to load it below...">
 <option value=""></option>
 <option value="vcard-jack">vCard: Jack Bauer</option>
+<option value="vcard-avenueq">vCard: Avenue Q</option>
 <option value="vevent-bluesday">vEvent: Bluesday Tuesday</option>
 <option value="work-waterfall">Licensing works: Waterfall</option>
 <option value="work-gallery">Licensing works: Gallery</option>
@@ -44,17 +45,17 @@ Examples:
 
 <div id="tabs">
   <ul>
-    <li><a href="#tabs-0">Preview</a></li>
-    <li><a href="#tabs-1" title="Microdata as JSON">JSON</a></li>
-    <li><a href="#tabs-2" title="RDF triples as Turtle">Turtle</a></li>
-    <li><a href="#tabs-3" title="Contact information as vCard">vCard</a></li>
-    <li><a href="#tabs-4" title="Calendar events as iCalendar">iCal</a></li>
+    <li><a href="#preview">Preview</a></li>
+    <li><a href="#json" title="Microdata as JSON">JSON</a></li>
+    <li><a href="#turtle" title="RDF triples as Turtle">Turtle</a></li>
+    <li><a href="#vcard" title="Contact information as vCard">vCard</a></li>
+    <li><a href="#ical" title="Calendar events as iCalendar">iCal</a></li>
   </ul>
-  <div id="tabs-0" class="preview"><i>... and it will be rendered here</i></div>
-  <div id="tabs-1" class="json"></div>
-  <div id="tabs-2" class="turtle"></div>
-  <div id="tabs-3" class="vcard"></div>
-  <div id="tabs-4" class="ical"></div>
+  <div id="preview"><i>... and it will be rendered here</i></div>
+  <div id="json"></div>
+  <div id="turtle"></div>
+  <div id="vcard"></div>
+  <div id="ical"></div>
 </div>
 
 <div class="footer"><q>When in doubt, refer to the

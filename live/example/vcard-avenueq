@@ -1,0 +1,8 @@
+<p>
+ Both
+ <span itemscope itemtype="http://microformats.org/profile/hcard" itemref="home"><span itemprop="fn">Princeton</span></span>
+ and
+ <span itemscope itemtype="http://microformats.org/profile/hcard" itemref="home"><span itemprop="fn">Trekkie</span></span>
+ live at
+ <span id="home" itemprop="adr" itemscope><span itemprop="street-address">Avenue Q</span>.</span>
+</p>

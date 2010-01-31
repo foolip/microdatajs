@@ -1,8 +1,14 @@
+/* -*- mode: js2; js2-basic-offset: 2; indent-tabs-mode: nil -*- */
+
 function update() {
   // preview always needed to put the microdata into the document
-  $('.preview').html($('textarea').val());
+  $('#preview').html($('textarea').val());
   // update selected tab
   updateTab($('#tabs').tabs('option', 'selected'));
+}
+
+function pre(text) {
+  return $('<pre>'+text.replace(/&/g, '&amp;').replace(/</g, '&lt;')+'</pre>');
 }
 
 function downloadIt($appendee, mime, data) {
@@ -16,39 +22,39 @@ function noItems($appendee, name, itemtype, spec) {
 function updateTab(index) {
   switch (index) {
   case 1:
-    var $json = $('.json').empty();
-    var jsonText = getJSON(document.getItems());
-    $json.append($(document.createElement('pre')).text(jsonText));
+    var $json = $('#json').empty();
+    var jsonText = $.microdata.json();
+    $json.append(pre(jsonText));
     downloadIt($json, 'application/json;encoding=utf-8', jsonText);
     break;
   case 2:
-    var $turtle = $('.turtle').empty();
-    var turtleText = getTurtle();
-    $turtle.append($(document.createElement('pre')).text(turtleText));
+    var $turtle = $('#turtle').empty();
+    var turtleText = $.microdata.turtle();
+    $turtle.append(pre(turtleText));
     downloadIt($turtle, 'text/turtle;encoding=utf-8', turtleText);
     break;
-  case 3: // vCard
-    var $vcard = $('.vcard').empty();
-    var hcards = document.getItems('http://microformats.org/profile/hcard');
-    if (hcards.length > 0) {
-      for (var i = 0; i < hcards.length; i++) {
-        var vCardText = getVCard(hcards[i]);
+  case 3:
+    var $vcard = $('#vcard').empty();
+    var $vcards = $(document).items('http://microformats.org/profile/hcard');
+    if ($vcards.length > 0) {
+      $vcards.each(function(i, node) {
+        var vcardText = $.microdata.vcard(node);
         if (i > 0)
           $vcard.append(document.createElement('hr'));
-        $vcard.append($(document.createElement('pre')).text(vCardText));
-        downloadIt($vcard, 'text/directory;profile=vCard;encoding=utf-8', vCardText);
-      }
+        $vcard.append(pre(vcardText));
+        downloadIt($vcard, 'text/directory;profile=vCard;encoding=utf-8', vcardText);
+      });
     } else {
       noItems($vcard, 'vCard', 'http://microformats.org/profile/hcard',
               'http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#vcard');
     }
     break;
   case 4: // iCal
-    var $ical = $('.ical').empty();
-    var iCalText = getICal();
-    if (iCalText) {
-      $ical.append($(document.createElement('pre')).text(iCalText));
-      downloadIt($ical, 'text/calendar;componenet=vevent;encoding=utf-8', iCalText);
+    var $ical = $('#ical').empty();
+    var icalText = $.microdata.ical();
+    if (icalText) {
+      $ical.append(pre(icalText));
+      downloadIt($ical, 'text/calendar;componenet=vevent;encoding=utf-8', icalText);
     } else {
       noItems($ical, 'vEvent', 'http://microformats.org/profile/hcalendar#vevent',
               'http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#vevent');
