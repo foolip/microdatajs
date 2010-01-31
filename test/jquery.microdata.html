@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+<title>jQuery Microdata Test Suite</title>
+<meta charset="utf-8">
+<script src="qunit/qunit/qunit.js"></script>
+<link rel="stylesheet" href="qunit/qunit/qunit.css">
+<script src="../lib/jquery-1.4.1.min.js"></script>
+<script src="../jquery.microdata.js"></script>
+<style>#testdata{display:none;}</style>
+</head>
+<body>
+  <h1 id="qunit-header">jQuery Microdata Test Suite</h1>
+  <h2 id="qunit-banner"></h2>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+  <div id="testdata">
+    <div id="w" itemscope itemtype="http://n.whatwg.org/work">
+      <a id="w0" itemprop="work" href="http://foolip.org/microdatajs/"></a>
+      <p id="w1" itemprop="title">MicrodataJS</p>
+      <p id="w2" itemprop="author">Philip Jägenstedt</p>
+      <a id="w3" itemprop="license" href="http://creativecommons.org/licenses/by/3.0/"></a>
+    </div>
+
+    <div id="x" itemscope itemtype="http://n.whatwg.org/work" itemref="x0 w3 noexist w2">
+      <img id="x0" itemprop="work" src="http://blog.foolip.org/">
+      <p id="x1" itemprop="title">Pretentious Nonsense</p>
+    </div>
+
+    <div id="loops" itemscope>
+      <div id="plain" itemprop="text">plain property</div>
+      <div id="loop0" itemprop="self" itemscope itemref="loop0"></div>
+      <div id="loop1" itemprop="head" itemscope itemref="loop2">not in the loop</div>
+      <div id="loop2" itemprop="next" itemscope itemref="loop3"></div>
+      <div id="loop3" itemprop="next" itemscope itemref="loop4"></div>
+      <div id="loop4" itemprop="next" itemscope itemref="loop2"></div>
+    </div>
+
+    <div id="io"> <!-- inside-out -->
+      <div id="ioBefore" itemprop="oddstuff">included via parent</div>
+      <div id="ioItem" itemscope itemref="io">
+	<div id="ioChild" itemprop="oddstuff">included via tree</div>
+      </div>
+      <div id="ioAfter" itemprop="oddstuff">included via parent</div>
+    </div>
+  </div>
+
+  <script src="jquery.microdata.unit.js"></script>
+</body>
+</html>
