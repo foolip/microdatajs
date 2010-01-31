@@ -46,36 +46,20 @@ function testStringReflection($elm, attr, func, attrString, funcString) {
   if (typeof $elm == 'string')
     $elm = $(document.createElement($elm));
 
-  // attr -> getter
   equals($elm[func](), '', 'get empty string');
   $elm.attr(attr, attrString);
   equals($elm[func](), funcString, 'get reflected string');
   $elm.removeAttr(attr);
   equals($elm[func](), '', 'get empty string');
-
-  // setter -> attr
-  ok(!$elm.attr(attr), 'no attr');
-  //equal($elm.attr(attr), undefined, 'no attr');
-  $elm[func](attrString);
-  equals($elm.attr(attr), attrString, 'reflected attr');
-  $elm[func]('');
-  equals($elm.attr(attr), '', 'empty attr');
 }
 
 test('jQuery.fn.itemScope', function() {
   var $elm = $(document.createElement('div'));
-  // attr -> getter
   equals($elm.itemScope(), false);
   $elm.attr('itemscope', '');
   equals($elm.itemScope(), true);
   $elm.get(0).removeAttribute('itemscope');
   equals($elm.itemScope(), false);
-  // setter -> attr
-  equals($elm.attr('itemscope'), undefined);
-  $elm.itemScope(true);
-  equals($elm.attr('itemscope'), 'itemscope');
-  $elm.itemScope(false);
-  equals($elm.attr('itemscope'), undefined);
 });
 
 test('jQuery.fn.itemType', function() {
@@ -115,17 +99,12 @@ test('jQuery.fn.itemRef', function() {
 module('jQuery.fn.itemValue');
 
 test('no @itemprop', function() {
-  var $elm = $(document.createElement('div'));
-  equals($elm.itemValue(), null);
-  $elm.itemValue('foo');
-  equals($elm.itemValue(), null);
+  equals($('<div></div>').itemValue(), null);
 });
 
 test('@itemscope', function() {
   var $elm = $('<div itemprop itemscope></div>');
-  equals($elm.itemValue(), $elm.get(0));
-  $elm.itemValue('foo');
-  equals($elm.itemValue(), $elm.get(0));
+  equals($elm.itemValue(), $elm.get(0), '@itemscope');
 });
 
 test('meta', function() {
@@ -173,22 +152,7 @@ test('object', function() {
 });
 
 test('time', function() {
-  // read-only for now
   equals($('<time></time>').itemValue(), undefined);
   equals($('<time itemprop>now</time>').itemValue(), 'now');
   equals($('<time itemprop datetime="1984-09-03">then</time>').itemValue(), '1984-09-03');
-/*
-  // text -> getter
-  $elm.text('now');
-  equals($elm.itemValue(), 'now');
-  // setter -> text
-  $elm.itemValue('later');
-  equals($elm.text(), 'later');
-  // attr -> getter
-  $elm.attr('datetime', '2010-01-24');
-  equals($elm.itemValue(), '2010-01-24');
-  // setter -> attr
-  $elm.itemValue('1984-09-03');
-  equals($elm.attr('datetime'), '1984-09-03');
-*/
 });

@@ -81,26 +81,12 @@
     });
   };
 
-  function itemScope(val) {
-    if (arguments.length == 0) {
-      return this.attr('itemscope') != undefined;
-    } else {
-      if (val) {
-        this.attr('itemscope', 'itemscope');
-      } else {
-        this.removeAttr('itemscope');
-      }
-    }
-    return this;
+  function itemScope() {
+    return this.attr('itemscope') != undefined;
   }
 
-  function itemType(val) {
-    if (arguments.length == 0) {
-      return this.attr('itemtype') || '';
-    } else {
-      this.attr('itemtype', val);
-    }
-    return this;
+  function itemType() {
+    return this.attr('itemtype') || '';
   }
 
   function resolve(url) {
@@ -111,13 +97,8 @@
     return img.src;
   }
 
-  function itemId(val) {
-    if (arguments.length == 0) {
-      return resolve(this.attr('itemid'));
-    } else {
-      this.attr('itemid', val);
-    }
-    return this;
+  function itemId() {
+    return resolve(this.attr('itemid'));
   }
 
   function tokenList(attr) {
@@ -131,61 +112,35 @@
     };
   }
 
-  function itemValue(val) {
+  function itemValue() {
     var elm = this.get(0);
-    var tag = elm.tagName.toUpperCase();
-    if (arguments.length == 0) {
-      if (this.attr('itemprop') === undefined)
-        return null;
-      if (this.itemScope()) {
-        return elm; // or a new jQuery object?
-      }
-      switch (tag) {
-      case 'META':
-        return this.attr('content') || '';
-      case 'AUDIO':
-      case 'EMBED':
-      case 'IFRAME':
-      case 'IMG':
-      case 'SOURCE':
-      case 'VIDEO':
-        return resolve(this.attr('src'));
-      case 'A':
-      case 'AREA':
-      case 'LINK':
-        return resolve(this.attr('href'));
-      case 'OBJECT':
-        return resolve(this.attr('data'));
-      case 'TIME':
-        var datetime = this.attr('datetime');
-        if (!(datetime === undefined))
-          return datetime;
-      default:
-        return this.text();
-      }
-    } else {
-      switch (tag) {
-      case 'META':
-        return this.attr('content', val);
-      case 'AUDIO':
-      case 'EMBED':
-      case 'IFRAME':
-      case 'IMG':
-      case 'SOURCE':
-      case 'VIDEO':
-        return this.attr('src', val);
-      case 'A':
-      case 'AREA':
-      case 'LINK':
-        return this.attr('href', val);
-      case 'OBJECT':
-        return this.attr('data', val);
-      case 'TIME':
-        if (!(this.attr('datetime') === undefined))
-          return this.attr('datetime', val);
-      default:
-        return this.text(val);
-      }
+    if (this.attr('itemprop') === undefined)
+      return null;
+    if (this.itemScope()) {
+      return elm; // or a new jQuery object?
+    }
+    switch (elm.tagName.toUpperCase()) {
+    case 'META':
+      return this.attr('content') || '';
+    case 'AUDIO':
+    case 'EMBED':
+    case 'IFRAME':
+    case 'IMG':
+    case 'SOURCE':
+    case 'VIDEO':
+      return resolve(this.attr('src'));
+    case 'A':
+    case 'AREA':
+    case 'LINK':
+      return resolve(this.attr('href'));
+    case 'OBJECT':
+      return resolve(this.attr('data'));
+    case 'TIME':
+      var datetime = this.attr('datetime');
+      if (!(datetime === undefined))
+        return datetime;
+    default:
+      return this.text();
     }
   }
 
