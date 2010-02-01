@@ -261,11 +261,18 @@ jQuery.microdata.rdf.prefix = {
   }
 
   jQuery.microdata.turtle = function(options) {
-    options = jQuery.extend({owl:false}, options);
+    options = jQuery.extend({doc:false,owl:false}, options);
 
     URI.prototype.blanks = 0;
     var triples = [];
-    extractDocumentTriples(triples);
+    if (options.doc) {
+      extractDocumentTriples(triples);
+    } else {
+      memory = [];
+      jQuery(document).items().each(function(i, item) {
+        generateItemTriples(item, triples, memory);
+      });
+    }
 
     if (options.owl) {
       triples.push(new Triple(new URI('http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3Awork'),
