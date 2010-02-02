@@ -32,6 +32,22 @@ h1 {
   margin: 0;
   padding: 0;
 }
+h1 a {
+  text-decoration: none;
+  color: black;
+}
+a {
+  color: #008;
+}
+.link {
+  margin-left: 8px;
+}
+.link:before {
+  content: "<";
+}
+.link:after {
+  content: ">";
+}
 .examples {
   display: block;
   margin: 0;

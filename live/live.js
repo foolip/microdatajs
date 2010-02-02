@@ -1,8 +1,10 @@
 /* -*- mode: js2; js2-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-function update() {
+function update(html) {
   // preview always needed to put the microdata into the document
-  $('#preview').html($('textarea').val());
+  $('#preview').html(html);
+  // update permalink
+  $('#permalink').attr('href', '?html='+encodeURIComponent(html));
   // update selected tab
   updateTab($('#tabs').tabs('option', 'selected'));
 }
@@ -68,18 +70,30 @@ $(function(){
 $(document).ready(function() {
   var $textarea = $('textarea');
   $textarea.TextAreaResizer();
-  $textarea.change(update);
+  $textarea.change(function(){update($textarea.val());});
   $textarea.keyup(function(ev) {
     // ignore home/end/page up/page down and left/up/down/right
     if (ev.keyCode < 33 || ev.keyCode > 40)
-      update();
+      update($textarea.val());
   });
+  if (window.location.search) {
+    jQuery.each(window.location.search.substr(1).split('&'), function() {
+      var nameval = this.split('=', 2);
+      var name = decodeURIComponent(nameval[0]);
+      var val = nameval.length == 2 ? decodeURIComponent(nameval[1]) : '';
+      switch (name) {
+      case 'html':
+        $textarea.val(val);
+        update(val);
+      }
+    });
+  }
   $('select').change(function(ev) {
     var source = ev.target.value;
     if (source) {
       $.get('example/'+source, function(data) {
         $textarea.val(data);
-        update();
+        update(data);
       });
     }
   });
