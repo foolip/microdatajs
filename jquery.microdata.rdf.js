@@ -136,7 +136,7 @@ jQuery.microdata.rdf.prefix = {
   }
 
   // http://www.whatwg.org/specs/web-apps/current-work/multipage/converting-html-to-other-formats.html#generate-the-triples-for-an-item
-  function generateItemTriples(item, triples, memory, fallbackType, fallbackName) {
+  function generateItemTriples(item, triples, memory, fallbackType) {
     var $item = jQuery(item);
     var subject;
     jQuery.each(memory, function(i, m) {
@@ -160,16 +160,8 @@ jQuery.microdata.rdf.prefix = {
       if (type.indexOf(':') < type.indexOf('#'))
         type += ':';
     }
-    if (!type && fallbackType) {
+    if (!type && fallbackType)
       type = fallbackType;
-      if (type.indexOf('#') == -1)
-        type += '#';
-      if (type.indexOf(':') < type.indexOf('#'))
-        type += ':';
-      if (type[type.length-1] != ':')
-        type += '%20';
-      type += encodeURIComponent(fallbackName);
-    }
     $item.properties().each(function(i, prop) {
       var $prop = jQuery(prop);
       $prop.itemProp().each(function(i, name) {
@@ -177,7 +169,7 @@ jQuery.microdata.rdf.prefix = {
           return;
         var value;
         if ($prop.itemScope()) {
-          value = generateItemTriples(prop, triples, memory, type, name);
+          value = generateItemTriples(prop, triples, memory, type);
         } else if (/^A|AREA|AUDIO|EMBED|IFRAME|IMG|LINK|OBJECT|SOURCE|VIDEO$/.test(prop.tagName.toUpperCase())) {
           value = new URI($prop.itemValue());
         } else {
@@ -187,11 +179,7 @@ jQuery.microdata.rdf.prefix = {
         if (isAbsoluteURL(name)) {
           predicate = name;
         } else if (name.indexOf(':') == -1) {
-          var s = type;
-          if (s[s.length-1] != ':')
-            s += '%20';
-          s += encodeURIComponent(name);
-          predicate = 'http://www.w3.org/1999/xhtml/microdata#'+encodeURIComponent(s);
+          predicate = 'http://www.w3.org/1999/xhtml/microdata#'+encodeURIComponent(type+name);
         }
         triples.push(new Triple(subject, new URI(predicate), value));
       });
