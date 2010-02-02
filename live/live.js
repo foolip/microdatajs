@@ -11,12 +11,12 @@ function pre(text) {
   return $('<pre>'+text.replace(/&/g, '&amp;').replace(/</g, '&lt;')+'</pre>');
 }
 
-function downloadIt($appendee, mime, data) {
-  $appendee.append($('<a class="download" href="data:'+mime+','+encodeURI(data)+'">Download it!</a>'));
+function downloadIt(mime, data) {
+  return $('<a class="download" href="data:'+mime+';charset=UTF-8,'+encodeURI(data)+'">Download it!</a>');
 }
 
-function noItems($appendee, name, itemtype, spec) {
-  $appendee.append($('<i>No <a href="'+spec+'">'+name+'</a> items (items with <code>itemtype="'+itemtype+'"</code>)</i>'));
+function noItems(name, itemtype, spec) {
+  return $('<i>No <a href="'+spec+'">'+name+'</a> items (items with <code>itemtype="'+itemtype+'"</code>)</i>');
 }
 
 function updateTab(index) {
@@ -25,13 +25,13 @@ function updateTab(index) {
     var $json = $('#json').empty();
     var jsonText = $.microdata.json();
     $json.append(pre(jsonText));
-    downloadIt($json, 'application/json;encoding=utf-8', jsonText);
+    $json.append(downloadIt('application/json', jsonText));
     break;
   case 2:
     var $turtle = $('#turtle').empty();
     var turtleText = $.microdata.turtle();
     $turtle.append(pre(turtleText));
-    downloadIt($turtle, 'text/turtle;encoding=utf-8', turtleText);
+    $turtle.append(downloadIt('text/turtle', turtleText));
     break;
   case 3:
     var $vcard = $('#vcard').empty();
@@ -42,11 +42,11 @@ function updateTab(index) {
         if (i > 0)
           $vcard.append(document.createElement('hr'));
         $vcard.append(pre(vcardText));
-        downloadIt($vcard, 'text/directory;profile=vCard;encoding=utf-8', vcardText);
+        $vcard.append(downloadIt('text/directory;profile=vCard', vcardText));
       });
     } else {
-      noItems($vcard, 'vCard', 'http://microformats.org/profile/hcard',
-              'http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#vcard');
+      $vcard.append(noItems('vCard', 'http://microformats.org/profile/hcard',
+                            'http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#vcard'));
     }
     break;
   case 4: // iCal
@@ -54,10 +54,10 @@ function updateTab(index) {
     var icalText = $.microdata.ical();
     if (icalText) {
       $ical.append(pre(icalText));
-      downloadIt($ical, 'text/calendar;componenet=vevent;encoding=utf-8', icalText);
+      $ical.append(downloadIt('text/calendar;componenet=vevent', icalText));
     } else {
-      noItems($ical, 'vEvent', 'http://microformats.org/profile/hcalendar#vevent',
-              'http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#vevent');
+      $ical.append(noItems('vEvent', 'http://microformats.org/profile/hcalendar#vevent',
+                           'http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#vevent'));
     }
     break;
   }
