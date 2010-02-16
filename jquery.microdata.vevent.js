@@ -24,7 +24,7 @@ jQuery.microdata.ical = function(selector) {
     var maxLen = 75;
     while (line.length > maxLen) {
       output += line.substr(0, maxLen);
-      line = line.subStr(maxLen);
+      line = line.substr(maxLen);
       output += '\r\n ';
       maxLen = 74;
     }
