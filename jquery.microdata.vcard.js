@@ -42,9 +42,6 @@ jQuery.microdata.vcard = function(selector) {
       addLine("NAME", [], escapeString($title.text()));
     if ($vcard.itemId())
       addLine("UID", [], escapeString($vcard.itemId()));
-    var firstN = null;
-    var firstOrg = null;
-    var firstFN = null;
     $vcard.properties().each(function() {
       var $prop = jQuery(this);
       $prop.itemProp().each(function() {
@@ -74,8 +71,6 @@ jQuery.microdata.vcard = function(selector) {
           }
 
           if (name == 'n') {
-            if (!firstN)
-              firstN = $subitem;
             value = escapeFirstProp('family-name')+';'+
               escapeFirstProp('given-name')+';'+
               escapeFirstProp('additional-name')+';'+
@@ -91,8 +86,6 @@ jQuery.microdata.vcard = function(selector) {
               escapeFirstProp('country-name');
             addTypeParam();
           } else if (name == 'org') {
-            if (!firstOrg)
-              firstOrg = $subitem;
             value = escapeFirstProp('organization-name', $subitem);
             $subitem.properties('organization-unit').each(function() {
               if (!jQuery(this).itemScope())
@@ -108,11 +101,6 @@ jQuery.microdata.vcard = function(selector) {
           }
         } else {
           // the property's value is not an item
-          if (name == 'fn' && !firstFN) {
-            firstFN = $prop;
-          } else if (name == 'org' && !firstOrg) {
-            firstOrg = $prop;
-          }
           value = $prop.itemValue();
           var tag = $prop.get(0).tagName.toUpperCase();
           // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#url-property-elements
@@ -130,30 +118,6 @@ jQuery.microdata.vcard = function(selector) {
         addLine(name, params, value);
       });
     });
-    if (!firstN && firstFN && !firstFN.itemScope()) {
-      function addN(first, second) {
-        var value = escapeString(first)+';'+escapeString(second)+';;;';
-        addLine('N', [], value);
-      }
-      if (firstOrg && !firstOrg.itemScope() && firstOrg == firstFN) {
-        addN('', '');
-      } else {
-        var m = /^(\S+)(\s+(\S+))?$/.exec(firstFN.itemValue());
-        if (m) {
-          var p1 = m[1];
-          var p2 = m[3] || '';
-          if (p1[p1.length-1] == ',') {
-            addN(p1.substr(0, p1.length-1), p2);
-          } else if (p2.length==2 && p2[1]=='.') {
-            addN(p1, p2[0]);
-          } else if (p2.length==1) {
-            addN(p1, p2);
-          } else {
-            addN(p2, p1);
-          }
-        }
-      }
-    }
     addLine('END', [], 'VCARD');
     return output;
   }

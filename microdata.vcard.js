@@ -106,9 +106,6 @@ function getVCard(node) {
 	addLine("NAME", [], escapeString(title.textContent));
     if (node.itemId)
 	addLine("UID", [], escapeString(node.itemId));
-    var firstN = null;
-    var firstOrg = null;
-    var firstFN = null;
     var props = node.properties;
     for (var propIndex=0; propIndex<props.length; propIndex++) {
 	var prop = props[propIndex];
@@ -143,8 +140,6 @@ function getVCard(node) {
 		}
 
 		if (name == 'n') {
-		    if (!firstN)
-			firstN = subitem;
 		    value = escapeFirstProp('family-name')+';'+
 			escapeFirstProp('given-name')+';'+
 			escapeFirstProp('additional-name')+';'+
@@ -160,8 +155,6 @@ function getVCard(node) {
 			escapeFirstProp('country-name');
 		    addTypeParam();
 		} else if (name == 'org') {
-		    if (!firstOrg)
-			firstOrg = subitem;
 		    value = escapeFirstProp('organization-name', subitem);
 		    var units = subitem.properties.namedItem('organization-unit');
 		    for (var unit=0; unit<units.length; unit++) {
@@ -178,11 +171,6 @@ function getVCard(node) {
 		}
 	    } else {
 		// the property's value is not an item
-		if (name == 'fn' && !firstFN) {
-		    firstFN = prop;
-		} else if (name == 'org' && !firstOrg) {
-		    firstOrg = prop;
-		}
 		value = prop.itemValue;
 		var tag = prop.tagName.toUpperCase();
 		// http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#url-property-elements
@@ -198,30 +186,6 @@ function getVCard(node) {
 		value = escapeString(value, name=='geo'?'\\\\,':'\\\\,;');
 	    }
 	    addLine(name, params, value);
-	}
-    }
-    if (!firstN && firstFN && !firstFN.itemScope) {
-	function addN(first, second) {
-	    var value = escapeString(first)+';'+escapeString(second)+';;;';
-	    addLine('N', [], value);
-	}
-	if (firstOrg && !firstOrg.itemScope && firstOrg == firstFN) {
-	    addN('', '');
-	} else {
-	    var m = /^(\S+)(\s+(\S+))?$/.exec(firstFN.itemValue);
-	    if (m) {
-		var p1 = m[1];
-		var p2 = m[3] || '';
-		if (p1[p1.length-1] == ',') {
-		    addN(p1.substr(0, p1.length-1), p2);
-		} else if (p2.length==2 && p2[1]=='.') {
-		    addN(p1, p2[0]);
-		} else if (p2.length==1) {
-		    addN(p1, p2);
-		} else {
-		    addN(p2, p1);
-		}
-	    }
 	}
     }
     addLine('END', [], 'VCARD');
