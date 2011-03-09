@@ -1,0 +1,12 @@
+Microdata is a syntax for embedding machine-readable metadata in HTML.
+
+MicrodataJS currently has two separate implementations:
+
+microdata.js mimics as closely as possible the syntax and behavior of
+the API defined in the HTML specification. This requires support for
+getters and setters (to emulate properties like itemValue) and will
+therefore requires a somewhat "modern" browser/ECMAScript engine.
+
+jquery.microdata.js is a jQuery that is functionally similar, but the
+API is more jQuery-like. This implementation works on older browsers,
+but obviously at the cost of depending on jQuery.
