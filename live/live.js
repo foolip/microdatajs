@@ -48,7 +48,7 @@ function updateTab(index) {
       });
     } else {
       $vcard.append(noItems('vCard', 'http://microformats.org/profile/hcard',
-                            'http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#vcard'));
+                            'http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#vcard'));
     }
     break;
   case 4: // iCal
@@ -59,7 +59,7 @@ function updateTab(index) {
       $ical.append(downloadIt('text/calendar;componenet=vevent', icalText));
     } else {
       $ical.append(noItems('vEvent', 'http://microformats.org/profile/hcalendar#vevent',
-                           'http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#vevent'));
+                           'http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#vevent'));
     }
     break;
   }

@@ -263,7 +263,7 @@ Object.defineProperty(Element.prototype, 'itemValue',
 
 Object.defineProperty(Element.prototype, 'properties', { get:
 function() {
-    // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#the-properties-of-an-item
+    // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#the-properties-of-an-item
     var itemElem = this;
 
     var props = [];

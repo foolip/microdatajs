@@ -1,6 +1,6 @@
 /* -*- mode: js2; js2-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-// http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#conversion-to-icalendar
+// http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#conversion-to-icalendar
 jQuery.microdata.ical = function(selector) {
   var veventURI = 'http://microformats.org/profile/hcalendar#vevent';
   var $events = selector ?
@@ -13,7 +13,7 @@ jQuery.microdata.ical = function(selector) {
     return;
 
   var output = '';
-  // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#add-an-icalendar-line
+  // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#add-an-icalendar-line
   function addLine(type, value, annotation) {
     var line = '';
     line += type.toUpperCase();

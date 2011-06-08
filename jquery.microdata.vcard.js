@@ -1,12 +1,12 @@
 /* -*- mode: js2; js2-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-// http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#conversion-to-vcard
+// http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#conversion-to-vcard
 jQuery.microdata.vcard = function(selector) {
   var vcardURI = 'http://microformats.org/profile/hcard';
 
   function extract($vcard) {
     var output = '';
-    // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#add-a-vcard-line
+    // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#add-a-vcard-line
     function addLine(type, params, value) {
       var line = '';
       line += type.toUpperCase();
@@ -28,7 +28,7 @@ jQuery.microdata.vcard = function(selector) {
       output += line;
       output += '\r\n';
     }
-    // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#escaping-the-vcard-text-string
+    // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#escaping-the-vcard-text-string
     function escapeString(value, chars) {
       var re = new RegExp('(['+(chars||'\\\\,;')+'])', 'g');
       return value.replace(re, '\\$1').replace(/\r\n|\r|\n/g, '\\n');
@@ -103,7 +103,7 @@ jQuery.microdata.vcard = function(selector) {
           // the property's value is not an item
           value = $prop.itemValue();
           var tag = $prop.get(0).tagName.toUpperCase();
-          // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#url-property-elements
+          // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#url-property-elements
           if (/^A|AREA|AUDIO|EMBED|IFRAME|IMG|LINK|OBJECT|SOURCE|VIDEO$/.test(tag)) {
             addParam('VALUE', 'URI');
           } else if (tag == 'TIME') {
