@@ -174,7 +174,7 @@ function getVCard(node) {
 		value = prop.itemValue;
 		var tag = prop.tagName.toUpperCase();
 		// http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#url-property-elements
-		if (/^A|AREA|AUDIO|EMBED|IFRAME|IMG|LINK|OBJECT|SOURCE|VIDEO$/.test(tag)) {
+		if (/^A|AREA|AUDIO|EMBED|IFRAME|IMG|LINK|OBJECT|SOURCE|TRACK|VIDEO$/.test(tag)) {
 		    addParam('VALUE', 'URI');
 		} else if (tag == 'TIME') {
 		    if (isValidDateString(prop.itemValue)) {

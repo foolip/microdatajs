@@ -232,7 +232,7 @@ function getItemValueProperty(e) {
 	return 'content';
     if (tag == 'AUDIO' || tag == 'EMBED' ||
 	tag == 'IFRAME' || tag == 'IMG' ||
-	tag == 'SOURCE' || tag == 'VIDEO')
+	tag == 'SOURCE' || tag == 'TRACK' || tag == 'VIDEO')
 	return 'src';
     if (tag == 'A' || tag == 'AREA' || tag == 'LINK')
 	return 'href';

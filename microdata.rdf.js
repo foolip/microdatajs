@@ -115,7 +115,7 @@ function getRDF() {
 	    if (prop.itemScope) {
 		// FIXME: the spec doesn't pass on type to subitems like this
 		value = generateItemTriples(prop, type);
-	    } else if (/^A|AREA|AUDIO|EMBED|IFRAME|IMG|LINK|OBJECT|SOURCE|VIDEO$/.test(prop.tagName.toUpperCase())) {
+	    } else if (/^A|AREA|AUDIO|EMBED|IFRAME|IMG|LINK|OBJECT|SOURCE|TRACK|VIDEO$/.test(prop.tagName.toUpperCase())) {
 		value = new URI(prop.itemValue);
 	    } else {
 		value = new Literal(prop.itemValue, getLang(prop));

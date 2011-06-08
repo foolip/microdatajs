@@ -170,7 +170,7 @@ jQuery.microdata.rdf.prefix = {
         var value;
         if ($prop.itemScope()) {
           value = generateItemTriples(prop, triples, memory, type);
-        } else if (/^A|AREA|AUDIO|EMBED|IFRAME|IMG|LINK|OBJECT|SOURCE|VIDEO$/.test(prop.tagName.toUpperCase())) {
+        } else if (/^A|AREA|AUDIO|EMBED|IFRAME|IMG|LINK|OBJECT|SOURCE|TRACK|VIDEO$/.test(prop.tagName.toUpperCase())) {
           value = new URI($prop.itemValue());
         } else {
           value = new Literal($prop.itemValue(), getLang($prop));

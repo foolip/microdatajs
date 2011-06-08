@@ -127,6 +127,7 @@
     case 'IFRAME':
     case 'IMG':
     case 'SOURCE':
+    case 'TRACK':
     case 'VIDEO':
       return resolve(this.attr('src'));
     case 'A':
