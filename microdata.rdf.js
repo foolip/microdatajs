@@ -168,10 +168,7 @@ var prefixMap = {'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
 		 'xhv': 'http://www.w3.org/1999/xhtml/vocab#',
 		 'dc': 'http://purl.org/dc/elements/1.1/',
 		 'dct': 'http://purl.org/dc/terms/',
-		 'cc': 'http://creativecommons.org/ns#',
-		 'hcard': 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fmicroformats.org%2Fprofile%2Fhcard%23%3A',
-		 'vevent': 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fmicroformats.org%2Fprofile%2Fhcalendar%23vevent%3A',
-		 'work': 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3A'};
+		 'cc': 'http://creativecommons.org/ns#'};
 
 function getTurtle(pretty) {
     if (arguments.length < 1)
