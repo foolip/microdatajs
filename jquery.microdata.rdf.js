@@ -15,7 +15,7 @@ jQuery.microdata.rdf.prefix = {
   'dc': 'http://purl.org/dc/terms/'
 };
 
-// http://www.whatwg.org/specs/web-apps/current-work/multipage/converting-html-to-other-formats.html#rdf
+// http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#rdf
 (function() {
   function splitTokens(s) {
     if (s && /\S/.test(s))
@@ -60,7 +60,7 @@ jQuery.microdata.rdf.prefix = {
     return undefined;
   }
 
-  // http://www.whatwg.org/specs/web-apps/current-work/multipage/converting-html-to-other-formats.html#extracting-rdf
+  // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#extracting-rdf
   function extractDocumentTriples(triples) {
     var $title = jQuery('title').first();
     if ($title.length == 1)
@@ -132,7 +132,7 @@ jQuery.microdata.rdf.prefix = {
     });
   }
 
-  // http://www.whatwg.org/specs/web-apps/current-work/multipage/converting-html-to-other-formats.html#generate-the-triples-for-an-item
+  // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#generate-the-triples-for-an-item
   function generateItemTriples(item, triples, memory, fallbackType) {
     var $item = jQuery(item);
     var subject;

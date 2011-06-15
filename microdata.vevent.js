@@ -1,4 +1,4 @@
-// http://www.whatwg.org/specs/vocabs/current-work/#conversion-to-icalendar
+// conversion-to-icalendarhttp://www.whatwg.org/specs/vocabs/current-work/#conversion-to-icalendar
 function getICal(node) {
     var veventURI = 'http://microformats.org/profile/hcalendar#vevent';
     var events;
@@ -16,7 +16,7 @@ function getICal(node) {
 	return;
 
     var output = '';
-    // http://www.whatwg.org/specs/vocabs/current-work/#add-an-icalendar-line
+    // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#add-an-icalendar-line
     function addLine(type, value, annotation) {
 	var line = '';
 	line += type.toUpperCase();

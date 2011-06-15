@@ -1,4 +1,4 @@
-// http://www.whatwg.org/specs/web-apps/current-work/multipage/converting-html-to-other-formats.html#rdf
+// http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#rdf
 function getRDF() {
     function URI(uri) {
 	if (uri)

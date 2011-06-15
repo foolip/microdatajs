@@ -1,6 +1,6 @@
 /* -*- mode: js2; js2-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-// http://www.whatwg.org/specs/web-apps/current-work/multipage/converting-html-to-other-formats.html#json
+// http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#json
 jQuery.microdata.json = function(selector) {
   function getObject($item) {
     var result = {};

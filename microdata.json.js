@@ -1,4 +1,4 @@
-// http://www.whatwg.org/specs/web-apps/current-work/multipage/converting-html-to-other-formats.html#json
+// http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#json
 function getJSON(nodes) {
     function getObject(item) {
 	var result = {};

@@ -54,13 +54,13 @@ function isValidGlobalDateAndTimeString(s) {
     return false;
 }
 
-// http://www.whatwg.org/specs/vocabs/current-work/#escaping-the-vcard-text-string
+// http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#escaping-the-vcard-text-string
 function escapeString(value, chars) {
     var re = new RegExp('(['+(chars||'\\\\,;')+'])', 'g');
     return value.replace(re, '\\$1').replace(/\r\n|\r|\n/g, '\\n');
 }
 
-// http://www.whatwg.org/specs/vocabs/current-work/#conversion-to-vcard
+// http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#conversion-to-vcard
 function getVCard(node) {
     var hcardURI = 'http://microformats.org/profile/hcard';
     if (node) {
@@ -74,7 +74,7 @@ function getVCard(node) {
 	return;
 
     var output = '';
-    // http://www.whatwg.org/specs/vocabs/current-work/#add-a-vcard-line
+    // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#add-a-vcard-line
     function addLine(type, params, value) {
 	var line = '';
 	line += type.toUpperCase();
