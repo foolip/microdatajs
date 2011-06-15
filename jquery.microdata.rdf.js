@@ -12,10 +12,7 @@ jQuery.microdata.rdf.prefix = {
   'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
   'owl': 'http://www.w3.org/2002/07/owl#',
   'cc': 'http://creativecommons.org/ns#',
-  'dc': 'http://purl.org/dc/terms/',
-  'vcard': 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fmicroformats.org%2Fprofile%2Fhcard%23%3A',
-  'vevent': 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fmicroformats.org%2Fprofile%2Fhcalendar%23vevent%3A',
-  'work': 'http://www.w3.org/1999/xhtml/microdata#http%3A%2F%2Fn.whatwg.org%2Fwork%23%3A'
+  'dc': 'http://purl.org/dc/terms/'
 };
 
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/converting-html-to-other-formats.html#rdf
