@@ -1,5 +1,5 @@
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#json
-function getJSON(nodes) {
+function getJSON(nodes, format) {
     function getObject(item) {
 	var result = {};
 	if (item.itemType)
@@ -29,5 +29,5 @@ function getJSON(nodes) {
 	if (nodes[nodeIndex].itemScope && !nodes[nodeIndex].hasAttribute('itemprop'))
 	    result.items.push(getObject(nodes[nodeIndex]));
     }
-    return JSON.stringify(result, undefined, 2);
+    return format ? format(result) : JSON.stringify(result, undefined, 2);
 }

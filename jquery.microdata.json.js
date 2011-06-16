@@ -1,7 +1,7 @@
 /* -*- mode: js2; js2-basic-offset: 2; indent-tabs-mode: nil -*- */
 
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#json
-jQuery.microdata.json = function(selector) {
+jQuery.microdata.json = function(selector, format) {
   function getObject($item) {
     var result = {};
     if ($item.itemType())
@@ -33,5 +33,5 @@ jQuery.microdata.json = function(selector) {
     if ($item.itemScope())
       result.items.push(getObject($item));
   });
-  return JSON.stringify(result, undefined, 2);
+  return format ? format(result) : JSON.stringify(result, undefined, 2);
 };
