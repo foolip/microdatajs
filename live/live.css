@@ -54,6 +54,10 @@ a {
   padding: 0 0 8px 0;
   float: right;
 }
+iframe {
+  border: none;
+  width: 100%;
+}
 hr {
   border: 0;
   height: 1px;

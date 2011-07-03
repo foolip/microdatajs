@@ -245,18 +245,18 @@ jQuery.microdata.rdf.prefix = {
     return head+'\n'+body;
   }
 
-  jQuery.microdata.turtle = function(options) {
-    options = jQuery.extend({doc:false,owl:false}, options);
+  jQuery.microdata.turtle = function(selector, options) {
+    options = jQuery.extend({owl:false}, options);
 
     URI.prototype.blanks = 0;
     var triples = [];
-    if (options.doc) {
-      extractDocumentTriples(triples);
-    } else {
-      memory = [];
-      jQuery(document).items().each(function(i, item) {
+    if (selector) {
+      var memory = [];
+      jQuery(selector).each(function(i, item) {
         generateItemTriples(item, triples, memory);
       });
+    } else {
+      extractDocumentTriples(triples);
     }
 
     if (options.owl) {

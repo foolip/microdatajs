@@ -1,12 +1,20 @@
 /* -*- mode: js2; js2-basic-offset: 2; indent-tabs-mode: nil -*- */
 
-function update(html) {
-  // preview always needed to put the microdata into the document
-  $('#preview').html(html);
+function update(iframe, html) {
+  // update preview
+  var doc = iframe.contentWindow.document;
+  doc.open();
+  // shrink iframe to max(150, height) (replace with <iframe seamless>?)
+  $(iframe.contentWindow).load(function() {
+    $(iframe).height(150);
+    $(iframe).height($(doc).height());
+  });
+  doc.write(html);
+  doc.close();
   // update permalink
   $('#permalink').attr('href', '?html='+encodeURIComponent(html));
   // update selected tab
-  updateTab($('#tabs').tabs('option', 'selected'));
+  updateTab(iframe, $('#tabs').tabs('option', 'selected'));
 }
 
 function pre(text) {
@@ -21,23 +29,25 @@ function noItems(name, itemtype, spec) {
   return $('<i>No <a href="'+spec+'">'+name+'</a> items (items with <code>itemtype="'+itemtype+'"</code>)</i>');
 }
 
-function updateTab(index) {
+function updateTab(iframe, index) {
+  var $doc = $(iframe.contentWindow.document);
   switch (index) {
-  case 1:
+  case 1: // JSON
     var $json = $('#json').empty();
-    var jsonText = $.microdata.json();
+    var jsonText = $.microdata.json($doc.items());
     $json.append(pre(jsonText));
     $json.append(downloadIt('application/json', jsonText));
     break;
-  case 2:
+  case 2: // Turtle
     var $turtle = $('#turtle').empty();
-    var turtleText = $.microdata.turtle();
+    var turtleText = $.microdata.turtle($doc.items());
     $turtle.append(pre(turtleText));
     $turtle.append(downloadIt('text/turtle', turtleText));
     break;
-  case 3:
+  case 3: // vCard
+    var vcardURI = 'http://microformats.org/profile/hcard';
     var $vcard = $('#vcard').empty();
-    var $vcards = $(document).items('http://microformats.org/profile/hcard');
+    var $vcards = $doc.items(vcardURI);
     if ($vcards.length > 0) {
       $vcards.each(function(i, node) {
         var vcardText = $.microdata.vcard(node);
@@ -47,35 +57,35 @@ function updateTab(index) {
         $vcard.append(downloadIt('text/directory;profile=vCard', vcardText));
       });
     } else {
-      $vcard.append(noItems('vCard', 'http://microformats.org/profile/hcard',
-                            'http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#vcard'));
+      $vcard.append(noItems('vCard', vcardURI, 'http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#vcard'));
     }
     break;
   case 4: // iCal
+    var veventURI = 'http://microformats.org/profile/hcalendar#vevent';
     var $ical = $('#ical').empty();
-    var icalText = $.microdata.ical();
+    var icalText = $.microdata.ical($doc.items(veventURI));
     if (icalText) {
       $ical.append(pre(icalText));
       $ical.append(downloadIt('text/calendar;componenet=vevent', icalText));
     } else {
-      $ical.append(noItems('vEvent', 'http://microformats.org/profile/hcalendar#vevent',
-                           'http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#vevent'));
+      $ical.append(noItems('vEvent', veventURI, 'http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#vevent'));
     }
     break;
   }
 }
-$(function(){
-  $('#tabs').tabs({show: function(ev, ui) { updateTab(ui.index); }});
-});
+
 $(document).ready(function() {
+  var iframe = document.getElementsByTagName('iframe')[0];
+  // textarea
   var $textarea = $('textarea');
   $textarea.TextAreaResizer();
-  $textarea.change(function(){update($textarea.val());});
+  $textarea.change(function() { update(iframe, $textarea.val()); });
   $textarea.keyup(function(ev) {
     // ignore home/end/page up/page down and left/up/down/right
     if (ev.keyCode < 33 || ev.keyCode > 40)
-      update($textarea.val());
+      update(iframe, $textarea.val());
   });
+  // permalink
   if (window.location.search) {
     jQuery.each(window.location.search.substr(1).split('&'), function() {
       var nameval = this.split('=', 2);
@@ -84,17 +94,22 @@ $(document).ready(function() {
       switch (name) {
       case 'html':
         $textarea.val(val);
-        update(val);
+        update(iframe, val);
       }
     });
   }
+  // examples
   $('select').change(function(ev) {
     var source = ev.target.value;
     if (source) {
       $.get('example/'+source, function(data) {
         $textarea.val(data);
-        update(data);
+        update(iframe, data);
       });
     }
+  });
+  // tabs
+  $(function(){
+    $('#tabs').tabs({show: function(ev, ui) { updateTab(iframe, ui.index); }});
   });
 });
