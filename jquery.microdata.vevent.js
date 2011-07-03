@@ -36,11 +36,11 @@ jQuery.microdata.ical = function(selector) {
   $events.each(function() {
     var $event = jQuery(this);
     addLine('BEGIN', 'VEVENT');
-    // thanks Hixie!
+    function zp(n) { return (n < 10 ? '0' : '') + n; }
     var stamp = new Date();
-    var stampString = '' + stamp.getUTCFullYear() + (stamp.getUTCMonth() + 1) +
-        stamp.getUTCDate() + 'T' + stamp.getUTCHours() +
-        stamp.getUTCMinutes() + stamp.getUTCSeconds() + 'Z';
+    var stampString = '' + stamp.getUTCFullYear() + zp(stamp.getUTCMonth() + 1) +
+        zp(stamp.getUTCDate()) + 'T' + zp(stamp.getUTCHours()) +
+        zp(stamp.getUTCMinutes()) + zp(stamp.getUTCSeconds()) + 'Z';
     addLine('DTSTAMP', stampString, 'VALUE=DATE-TIME');
     if ($event.itemId())
       addLine('UID', $event.itemId());
