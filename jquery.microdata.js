@@ -191,12 +191,17 @@
           });
         }
       }
+      // traverse child elements
       var $item = jQuery(item);
       $item.children().each(function() {
         traverse(this);
       });
+      // traverse itemref'd elements
+      var context = item;
+      while (context.parentNode)
+        context = context.parentNode;
       $item.itemRef().each(function(i, id) {
-        var $ref = jQuery('#'+id);
+        var $ref = jQuery('#'+id, context);
         if ($ref.length == 1)
           traverse($ref.get(0));
       });
