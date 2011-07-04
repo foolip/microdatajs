@@ -1,4 +1,4 @@
-/* -*- mode: js2; js2-basic-offset: 2; indent-tabs-mode: nil -*- */
+/* -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#conversion-to-icalendar
 jQuery.microdata.ical = function(selector) {

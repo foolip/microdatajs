@@ -1,4 +1,4 @@
-/* -*- mode: js2; js2-basic-offset: 2; indent-tabs-mode: nil -*- */
+/* -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 
 test('jQuery.fn.items', function() {
   function t(context, types, expected) {

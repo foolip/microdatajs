@@ -1,4 +1,4 @@
-/* -*- mode: js2; js2-basic-offset: 2; indent-tabs-mode: nil -*- */
+/* -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 
 // a small set of prefixes used by the microdata spec.
 // additional prefixes can be added externally, e.g.:
