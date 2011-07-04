@@ -53,7 +53,7 @@ jQuery.microdata.rdf.prefix = {
   }
 
   function getLang($elem) {
-    for (; $elem.get(0); $elem = $elem.parent()) {
+    for (; $elem[0]; $elem = $elem.parent()) {
       if ($elem.attr('lang'))
         return $elem.attr('lang');
     }

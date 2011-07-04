@@ -58,7 +58,7 @@ test('jQuery.fn.itemScope', function() {
   equals($elm.itemScope(), false);
   $elm.attr('itemscope', '');
   equals($elm.itemScope(), true);
-  $elm.get(0).removeAttribute('itemscope');
+  $elm[0].removeAttribute('itemscope');
   equals($elm.itemScope(), false);
 });
 
@@ -104,7 +104,7 @@ test('no @itemprop', function() {
 
 test('@itemscope', function() {
   var $elm = $('<div itemprop itemscope></div>');
-  equals($elm.itemValue(), $elm.get(0), '@itemscope');
+  equals($elm.itemValue(), $elm[0], '@itemscope');
 });
 
 test('meta', function() {

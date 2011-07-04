@@ -113,7 +113,7 @@
   }
 
   function itemValue() {
-    var elm = this.get(0);
+    var elm = this[0];
     if (this.attr('itemprop') === undefined)
       return null;
     if (this.itemScope()) {
@@ -203,7 +203,7 @@
       $item.itemRef().each(function(i, id) {
         var $ref = jQuery('#'+id, context);
         if ($ref.length == 1)
-          traverse($ref.get(0));
+          traverse($ref[0]);
       });
     }
 
