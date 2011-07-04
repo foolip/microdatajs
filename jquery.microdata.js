@@ -69,6 +69,9 @@
   }
 
   function getItems(types) {
+    var doc = this[0];
+    if (doc.getItems)
+      return jQuery(types ? doc.getItems(types) : doc.getItems());
     var selector = jQuery.map(splitTokens(types), function(t) {
       return '[itemtype~="'+t.replace(/"/g, '\\"')+'"]';
     }).join(',') || '*';
@@ -79,7 +82,7 @@
       return (this.getAttribute('itemscope') != null &&
               this.getAttribute('itemprop') == null);
     });
-  };
+  }
 
   function itemScope() {
     return this.attr('itemscope') != undefined;
