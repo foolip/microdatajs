@@ -92,10 +92,6 @@
     return img.src;
   }
 
-  function itemId() {
-    return resolve(this.attr('itemid'));
-  }
-
   function tokenList(attr) {
     return function() {
       return jQuery(splitTokens(this.attr(attr)));
@@ -209,25 +205,29 @@
   var t = jQuery('<div itemscope itemtype="type" itemid="id" itemprop="prop" itemref="ref">')[0];
 
   jQuery.fn.extend({
-    items     : getItems,
-    itemScope : t.itemScope ? function() {
+    items: getItems,
+    itemScope: t.itemScope ? function() {
       return this[0].itemScope;
     } : function () {
       return this.attr('itemscope') != undefined;
     },
-    itemType  : t.itemType ? function() {
+    itemType: t.itemType ? function() {
       return this[0].itemType;
     } : function () {
       return this.attr('itemtype') || '';
     },
-    itemId    : itemId,
-    itemProp  : t.itemProp && t.itemProp.length ? function() {
+    itemId: t.itemId ? function() {
+      return this[0].itemId;
+    } : function () {
+      return resolve(this.attr('itemid'));
+    },
+    itemProp: t.itemProp && t.itemProp.length ? function() {
       return jQuery(this[0].itemProp);
     } : tokenList('itemprop'),
-    itemRef   : t.itemRef && t.itemRef.length ? function() {
+    itemRef: t.itemRef && t.itemRef.length ? function() {
       return jQuery(this[0].itemRef);
     } : tokenList('itemref'),
-    itemValue : t.itemValue ? function() {
+    itemValue: t.itemValue ? function() {
       return this[0].itemValue;
     } : itemValue,
     properties: properties
