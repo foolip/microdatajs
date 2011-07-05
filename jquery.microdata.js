@@ -84,10 +84,6 @@
     });
   }
 
-  function itemScope() {
-    return this.attr('itemscope') != undefined;
-  }
-
   function itemType() {
     return this.attr('itemtype') || '';
   }
@@ -218,7 +214,11 @@
 
   jQuery.fn.extend({
     items     : getItems,
-    itemScope : itemScope,
+    itemScope : t.itemScope ? function() {
+      return this[0].itemScope;
+    } : function () {
+      return this.attr('itemscope') != undefined;
+    },
     itemType  : itemType,
     itemId    : itemId,
     itemProp  : t.itemProp && t.itemProp.length ? function() {
