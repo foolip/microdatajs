@@ -222,7 +222,9 @@
     itemType  : itemType,
     itemId    : itemId,
     itemProp  : tokenList('itemprop'),
-    itemRef   : tokenList('itemref'),
+    itemRef   : t.itemRef && t.itemRef.length ? function() {
+      return jQuery(this[0].itemRef);
+    } : tokenList('itemref'),
     itemValue : t.itemValue ? function() {
       return this[0].itemValue;
     } : itemValue,
