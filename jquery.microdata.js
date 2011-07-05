@@ -106,12 +106,7 @@
 
   function tokenList(attr) {
     return function() {
-      var tokens = [];
-      jQuery.each(splitTokens(this.attr(attr)), function(i, token) {
-        if (jQuery.inArray(token, tokens) == -1)
-          tokens.push(token);
-      });
-      return jQuery(tokens);
+      return jQuery(splitTokens(this.attr(attr)));
     };
   }
 

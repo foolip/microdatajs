@@ -12,7 +12,7 @@ test('jQuery.fn.items', function() {
          $.map(expected, function(id) { return document.getElementById(id); }),
          msg);
   }
-  t(document, undefined, ['w', 'x', 'loops', 'ioItem']);
+  t(document, undefined, ['w', 'x', 'dupref', 'loops', 'ioItem']);
   t('#x', undefined, []);
   t('#io', undefined, ['ioItem']);
   t(document, 'http://n.whatwg.org/work', ['w', 'x']);
@@ -28,6 +28,7 @@ test('jQuery.fn.properties', function() {
   t('#testdata', []);
   t('#w', ['w0', 'w1', 'w2', 'w3']);
   t('#x', ['w2', 'w3', 'x0', 'x1']);
+  t('#dupref', ['w1']);
   t('#loops', ['plain', 'loop0','loop1', 'loop2', 'loop3', 'loop4']);
   t('#loop0', []);
   t('#loop1', ['loop2']);
@@ -80,8 +81,8 @@ test('jQuery.fn.itemProp', function() {
   t('<meta itemprop="do">', ['do']);
   t('<meta itemprop="do re">', ['do', 're']);
   t('<meta itemprop="re do">', ['re', 'do']);
-  t('<meta itemprop="do do">', ['do']);
-  t('<meta itemprop="do re do">', ['do', 're']);
+  t('<meta itemprop="do do">', ['do', 'do']);
+  t('<meta itemprop="do re do">', ['do', 're', 'do']);
 });
 
 test('jQuery.fn.itemRef', function() {
@@ -92,8 +93,8 @@ test('jQuery.fn.itemRef', function() {
   t('<meta itemref="do">', ['do']);
   t('<meta itemref="do re">', ['do', 're']);
   t('<meta itemref="re do">', ['re', 'do']);
-  t('<meta itemref="do do">', ['do']);
-  t('<meta itemref="do re do">', ['do', 're']);
+  t('<meta itemref="do do">', ['do', 'do']);
+  t('<meta itemref="do re do">', ['do', 're', 'do']);
 });
 
 module('jQuery.fn.itemValue');
