@@ -84,10 +84,6 @@
     });
   }
 
-  function itemType() {
-    return this.attr('itemtype') || '';
-  }
-
   function resolve(url) {
     if (!url)
       return '';
@@ -219,7 +215,11 @@
     } : function () {
       return this.attr('itemscope') != undefined;
     },
-    itemType  : itemType,
+    itemType  : t.itemType ? function() {
+      return this[0].itemType;
+    } : function () {
+      return this.attr('itemtype') || '';
+    },
     itemId    : itemId,
     itemProp  : t.itemProp && t.itemProp.length ? function() {
       return jQuery(this[0].itemProp);
