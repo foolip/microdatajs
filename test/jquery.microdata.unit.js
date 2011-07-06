@@ -12,7 +12,7 @@ test('jQuery.fn.items', function() {
          $.map(expected, function(id) { return document.getElementById(id); }),
          msg);
   }
-  t(document, undefined, ['w', 'x', 'dupref', 'loops', 'ioItem']);
+  t(document, undefined, ['w', 'x', 'dupref', 'loops', 'ioItem', 'dupprops']);
   t('#x', undefined, []);
   t('#io', undefined, ['ioItem']);
   t(document, 'http://n.whatwg.org/work', ['w', 'x']);
@@ -20,22 +20,29 @@ test('jQuery.fn.items', function() {
 });
 
 test('jQuery.fn.properties', function() {
-  function t(selector, expected) {
-    same($(selector).properties().toArray(),
+  function t(selector, name, expected) {
+    same($(selector).properties(name).toArray(),
          $.map(expected, function(id) { return document.getElementById(id); }),
          selector);
   }
-  t('#testdata', []);
-  t('#w', ['w0', 'w1', 'w2', 'w3']);
-  t('#x', ['w2', 'w3', 'x0', 'x1']);
-  t('#dupref', ['w1']);
-  t('#loops', ['plain', 'loop0','loop1', 'loop2', 'loop3', 'loop4']);
-  t('#loop0', []);
-  t('#loop1', ['loop2']);
-  t('#loop2', []);
-  t('#loop3', []);
-  t('#loop4', []);
-  t('#ioItem', ['ioBefore', 'ioChild', 'ioAfter']);
+  t('#testdata', undefined, []);
+  t('#w', undefined, ['w0', 'w1', 'w2', 'w3']);
+  t('#w', 'title', ['w1']);
+  t('#w', 'noexist', []);
+  t('#x', undefined, ['w2', 'w3', 'x0', 'x1']);
+  t('#x', 'work', ['x0']);
+  t('#x', 'author', ['w2']);
+  t('#dupref', undefined, ['w1']);
+  t('#loops', undefined, ['plain', 'loop0','loop1', 'loop2', 'loop3', 'loop4']);
+  t('#loop0', undefined, []);
+  t('#loop1', undefined, ['loop2']);
+  t('#loop2', undefined, ['loop3']);
+  t('#loop3', undefined, ['loop4']);
+  t('#loop4', undefined, ['loop2']);
+  t('#ioItem', undefined, ['ioBefore', 'ioChild', 'ioAfter']);
+  t('#dupprops', undefined, ['foo0', 'bar0', 'bar1', 'foo1']);
+  t('#dupprops', 'foo', ['foo0', 'foo1']);
+  t('#dupprops', 'bar', ['bar0', 'bar1']);
 });
 
 function testStringReflection($elm, attr, func, attrString, funcString) {

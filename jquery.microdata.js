@@ -132,72 +132,54 @@
   }
 
   function properties(name) {
+    // Find all elements that add properties to the item, optionally
+    // filtered by a property name. Look in the subtrees rooted at the
+    // item itself and any itemref'd elements. An item can never have
+    // itself as a property, but circular reference is possible.
+
     var props = [];
-    // visitItem adds properties or checks for itemref loops,
-    // depending on if a stack of visited items is given.
-    function visitItem(item, visited) {
-      // traverse tree for property nodes
+
+    function crawl(root) {
+      var toTraverse = [root];
+
       function traverse(node) {
+        for (var i = 0; i < toTraverse.length; i++) {
+          if (toTraverse[i] == node)
+            toTraverse.splice(i--, 1);
+        }
         var $node = jQuery(node);
-        var $names = $node.itemProp();
-        if ($names.length > 0) {
-          // this is a property node
-          if (visited) {
-            // only look for itemref loops; don't add properties
-            if ($node.itemScope()) {
-              switch (jQuery.inArray(node, visited)) {
-              case -1:
-                // no loop (yet)
-                visitItem(node, visited.concat([node]));
-                break;
-              case 0:
-                // self-referring item/property
-                throw prop;
-              }
-            }
-          } else {
-            // add property if name matches and it is not self-referring
-            if (!name || jQuery.inArray(name, $names.toArray()) != -1) {
-              if ($node.itemScope()) {
-                try {
-                  visitItem(node, [item]);
-                } catch (ex) {
-                  // skip this self-referring property
-                  return;
-                }
-              }
+        if (node != root) {
+          var $names = $node.itemProp();
+          if ($names.length) {
+            if (!name || jQuery.inArray(name, $names.toArray()) != -1)
               props.push(node);
-            }
           }
+          if ($node.itemScope())
+            return;
         }
-        // don't traverse into subitems
-        if (!$node.itemScope()) {
-          $node.children().each(function() {
-            traverse(this);
-          });
-        }
+        $node.children().each(function() {
+          traverse(this);
+        });
       }
-      // traverse child elements
-      var $item = jQuery(item);
-      $item.children().each(function() {
-        traverse(this);
-      });
-      // traverse itemref'd elements
-      var context = item;
+
+      var context = root;
       while (context.parentNode)
         context = context.parentNode;
-      $item.itemRef().each(function(i, id) {
+      $(root).itemRef().each(function(i, id) {
         var $ref = jQuery('#'+id, context);
-        if ($ref.length == 1)
-          traverse($ref[0]);
+        if ($ref.length)
+          toTraverse.push($ref[0]);
       });
+      jQuery.unique(toTraverse);
+
+      while (toTraverse.length) {
+        traverse(toTraverse[0]);
+      }
     }
 
-    this.each(function(i, node) {
-      if (jQuery(node).itemScope())
-        visitItem(node);
-    });
-    // make results unique and sorted in document order
+    if (this.itemScope())
+      crawl(this[0]);
+
     return jQuery(jQuery.unique(props));
   }
 
