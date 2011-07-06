@@ -2,13 +2,15 @@
 
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#conversion-to-icalendar
 jQuery.microdata.ical = function(selector) {
+  var $ = jQuery;
+
   var veventURI = 'http://microformats.org/profile/hcalendar#vevent';
   var $events = selector ?
-    jQuery(selector).filter(function() {
-      var $this = jQuery(this);
+    $(selector).filter(function() {
+      var $this = $(this);
       return $this.itemScope() && $this.itemType() == veventURI;
     }) :
-    jQuery(document).items(veventURI);
+    $(document).items(veventURI);
   if ($events.length == 0)
     return;
 
@@ -34,7 +36,7 @@ jQuery.microdata.ical = function(selector) {
   addLine('PRODID', 'jQuery Microdata');
   addLine('VERSION', '2.0');
   $events.each(function() {
-    var $event = jQuery(this);
+    var $event = $(this);
     addLine('BEGIN', 'VEVENT');
     function zp(n) { return (n < 10 ? '0' : '') + n; }
     var stamp = new Date();
@@ -45,16 +47,16 @@ jQuery.microdata.ical = function(selector) {
     if ($event.itemId())
       addLine('UID', $event.itemId());
     $event.properties().each(function() {
-      var $elem = jQuery(this);
+      var $elem = $(this);
       if ($elem.itemScope())
         return;
       $elem.itemProp().each(function() {
         var name = this;
         if ($elem.get(0).tagName.toUpperCase() == 'TIME') {
           var value = $elem.itemValue().replace(/[-:]/g, '');
-          if (jQuery.microdata.isValidDateString($elem.itemValue())) {
+          if ($.microdata.isValidDateString($elem.itemValue())) {
             addLine(name, value, "VALUE=DATE");
-          } else if (jQuery.microdata.isValidGlobalDateAndTimeString($elem.itemValue())) {
+          } else if ($.microdata.isValidGlobalDateAndTimeString($elem.itemValue())) {
             addLine(name, value, "VALUE=DATE-TIME");
           }
         } else {

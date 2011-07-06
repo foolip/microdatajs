@@ -1,22 +1,24 @@
 /* -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 
-// a small set of prefixes used by the microdata spec.
-// additional prefixes can be added externally, e.g.:
-//
-// jQuery.extend(jQuery.microdata.rdf.prefix, {
-//   'foo': 'http://example.com/foo#'
-// });
-jQuery.microdata.rdf = {};
-jQuery.microdata.rdf.prefix = {
-  'xhv': 'http://www.w3.org/1999/xhtml/vocab#',
-  'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-  'owl': 'http://www.w3.org/2002/07/owl#',
-  'cc': 'http://creativecommons.org/ns#',
-  'dc': 'http://purl.org/dc/terms/'
-};
-
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#rdf
 (function() {
+  var $ = jQuery;
+
+  // a small set of prefixes used by the microdata spec.
+  // additional prefixes can be added externally, e.g.:
+  //
+  // jQuery.extend(jQuery.microdata.rdf.prefix, {
+  //   'foo': 'http://example.com/foo#'
+  // });
+  $.microdata.rdf = {};
+  $.microdata.rdf.prefix = {
+    'xhv': 'http://www.w3.org/1999/xhtml/vocab#',
+    'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+    'owl': 'http://www.w3.org/2002/07/owl#',
+    'cc': 'http://creativecommons.org/ns#',
+    'dc': 'http://purl.org/dc/terms/'
+  };
+
   function splitTokens(s) {
     if (s && /\S/.test(s))
       return s.replace(/^\s+|\s+$/g,'').split(/\s+/);
@@ -62,16 +64,16 @@ jQuery.microdata.rdf.prefix = {
 
   // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#extracting-rdf
   function extractDocumentTriples(triples) {
-    var $title = jQuery('title').first();
+    var $title = $('title').first();
     if ($title.length == 1)
       triples.push(new Triple(new URI(document.location.href),
                               new URI('http://purl.org/dc/terms/title'),
                               new Literal($title.text(), getLang($title))));
 
-    jQuery('a[rel][href],area[rel][href],link[rel][href]').each(function(i, elm) {
-      var $elm = jQuery(elm);
+    $('a[rel][href],area[rel][href],link[rel][href]').each(function(i, elm) {
+      var $elm = $(elm);
       var tokens = {};
-      jQuery.each(splitTokens($elm.attr('rel')), function(i, t) {
+      $.each(splitTokens($elm.attr('rel')), function(i, t) {
         t = t.toLowerCase();
         if (tokens[t])
           tokens[t]++;
@@ -100,8 +102,8 @@ jQuery.microdata.rdf.prefix = {
       }
     });
 
-    jQuery('meta[name][content]').each(function(i, meta) {
-      var $meta = jQuery(meta);
+    $('meta[name][content]').each(function(i, meta) {
+      var $meta = $(meta);
       var name = $meta.attr('name');
       var predicate;
       if (name.indexOf(':') == -1)
@@ -115,16 +117,16 @@ jQuery.microdata.rdf.prefix = {
                               new Literal($meta.attr('content'), getLang($meta))));
     });
 
-    jQuery('blockquote[cite],q[cite]').each(function(i, elm) {
+    $('blockquote[cite],q[cite]').each(function(i, elm) {
       // FIXME: resolve cite attribute
       triples.push(new Triple(new URI(document.location.href),
                               new URI('http://purl.org/dc/terms/source'),
-                              new URI(jQuery(elm).attr('cite'))));
+                              new URI($(elm).attr('cite'))));
     });
 
     // list of {item: ..., subject: ...} objects
     var memory = [];
-    jQuery(document).items().each(function(i, item) {
+    $(document).items().each(function(i, item) {
       var t = new Triple(new URI(document.location.href),
                          new URI('http://www.w3.org/1999/xhtml/microdata#item'),
                          generateItemTriples(item, triples, memory));
@@ -134,9 +136,9 @@ jQuery.microdata.rdf.prefix = {
 
   // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#generate-the-triples-for-an-item
   function generateItemTriples(item, triples, memory, fallbackType) {
-    var $item = jQuery(item);
+    var $item = $(item);
     var subject;
-    jQuery.each(memory, function(i, m) {
+    $.each(memory, function(i, m) {
       if (m.item == item) {
         subject = m.subject;
         return false;
@@ -160,7 +162,7 @@ jQuery.microdata.rdf.prefix = {
     if (!type && fallbackType)
       type = fallbackType;
     $item.properties().each(function(i, prop) {
-      var $prop = jQuery(prop);
+      var $prop = $(prop);
       $prop.itemProp().each(function(i, name) {
         if (!type && !isAbsoluteURL(name))
           return;
@@ -195,10 +197,10 @@ jQuery.microdata.rdf.prefix = {
         if (term.isBlank())
           return term.uri;
         // prefixed notation
-        for (name in jQuery.microdata.rdf.prefix) {
-          var uri = jQuery.microdata.rdf.prefix[name];
+        for (name in $.microdata.rdf.prefix) {
+          var uri = $.microdata.rdf.prefix[name];
           if (term.uri.substr(0, uri.length) == uri) {
-            if (jQuery.inArray(name, used) == -1)
+            if ($.inArray(name, used) == -1)
               used.push(name);
             return name+':'+term.uri.substr(uri.length);
           }
@@ -216,7 +218,7 @@ jQuery.microdata.rdf.prefix = {
       var subject = triples[0].s;
       var batch = [];
       // extract all triples that share same subject into batch
-      triples = jQuery.grep(triples, function (t) {
+      triples = $.grep(triples, function (t) {
         if (subject.equals(t.s)) {
           batch.push(t);
           return false;
@@ -232,27 +234,27 @@ jQuery.microdata.rdf.prefix = {
       } else {
         // subject on first line, predicate-objects follow indented
         body += format(batch[0].s)+'\n';
-        jQuery.each(batch, function(i, t) {
+        $.each(batch, function(i, t) {
           body += '  '+format(t.p)+' '+format(t.o)+' '+((i+1<batch.length)?';':'.')+'\n';
         });
       }
     }
 
     var head = '';
-    jQuery.each(used, function(i, name) {
-        head += '@prefix '+name+': <'+jQuery.microdata.rdf.prefix[name]+'> .\n';
+    $.each(used, function(i, name) {
+        head += '@prefix '+name+': <'+$.microdata.rdf.prefix[name]+'> .\n';
     });
     return head+'\n'+body;
   }
 
-  jQuery.microdata.turtle = function(selector, options) {
-    options = jQuery.extend({owl:false}, options);
+  $.microdata.turtle = function(selector, options) {
+    options = $.extend({owl:false}, options);
 
     URI.prototype.blanks = 0;
     var triples = [];
     if (selector) {
       var memory = [];
-      jQuery(selector).each(function(i, item) {
+      $(selector).each(function(i, item) {
         generateItemTriples(item, triples, memory);
       });
     } else {

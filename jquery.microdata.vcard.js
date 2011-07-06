@@ -2,6 +2,8 @@
 
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#conversion-to-vcard
 jQuery.microdata.vcard = function(selector) {
+  var $ = jQuery;
+
   var vcardURI = 'http://microformats.org/profile/hcard';
 
   function extract($vcard) {
@@ -37,13 +39,13 @@ jQuery.microdata.vcard = function(selector) {
     addLine("PROFILE", [], "VCARD");
     addLine("VERSION", [], "3.0");
     addLine("SOURCE", [], escapeString(document.location.href));
-    var $title = jQuery("title").first();
+    var $title = $("title").first();
     if ($title.length > 0)
       addLine("NAME", [], escapeString($title.text()));
     if ($vcard.itemId())
       addLine("UID", [], escapeString($vcard.itemId()));
     $vcard.properties().each(function() {
-      var $prop = jQuery(this);
+      var $prop = $(this);
       $prop.itemProp().each(function() {
         var name = this;
         var params = [];
@@ -61,8 +63,8 @@ jQuery.microdata.vcard = function(selector) {
           }
           function escapeProps(name) {
             return $subitem.properties(name)
-              .filter(function(){return !jQuery(this).itemScope();})
-              .map(function(){return escapeString(jQuery(this).itemValue());})
+              .filter(function(){return !$(this).itemScope();})
+              .map(function(){return escapeString($(this).itemValue());})
               .toArray().join(',');
           }
           function escapeFirstProp(name) {
@@ -88,8 +90,8 @@ jQuery.microdata.vcard = function(selector) {
           } else if (name == 'org') {
             value = escapeFirstProp('organization-name', $subitem);
             $subitem.properties('organization-unit').each(function() {
-              if (!jQuery(this).itemScope())
-                value += ';' + escapeString(jQuery(this).itemValue());
+              if (!$(this).itemScope())
+                value += ';' + escapeString($(this).itemValue());
             });
           } else if (name == 'agent' && $subitem.itemType() == vcardURI) {
             value = escapeString(extract($subitem));
@@ -107,9 +109,9 @@ jQuery.microdata.vcard = function(selector) {
           if (/^A|AREA|AUDIO|EMBED|IFRAME|IMG|LINK|OBJECT|SOURCE|TRACK|VIDEO$/.test(tag)) {
             addParam('VALUE', 'URI');
           } else if (tag == 'TIME') {
-            if (jQuery.microdata.isValidDateString($prop.itemValue())) {
+            if ($.microdata.isValidDateString($prop.itemValue())) {
               addParam('VALUE', 'DATE');
-            } else if (jQuery.microdata.isValidGlobalDateAndTimeString($prop.itemValue())) {
+            } else if ($.microdata.isValidGlobalDateAndTimeString($prop.itemValue())) {
               addParam('VALUE', 'DATE-TIME');
             }
           }
@@ -123,11 +125,11 @@ jQuery.microdata.vcard = function(selector) {
   }
 
   var $vcard = (selector ?
-                jQuery(selector).filter(function() {
-                  var $this = jQuery(this);
+                $(selector).filter(function() {
+                  var $this = $(this);
                   return $this.itemScope() && $this.itemType() == vcardURI;
                 }) :
-                jQuery(document).items(vcardURI)).first();
+                $(document).items(vcardURI)).first();
   if ($vcard.length == 1)
     return extract($vcard);
 };

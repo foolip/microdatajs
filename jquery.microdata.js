@@ -1,7 +1,9 @@
 /* -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 
 (function(){
-  jQuery.microdata = {};
+  var $ = jQuery;
+
+  $.microdata = {};
 
   // http://www.whatwg.org/specs/web-apps/current-work/multipage/common-microsyntaxes.html#valid-time-string
   function validTimeStringLength(s) {
@@ -59,8 +61,8 @@
     return false;
   }
 
-  jQuery.microdata.isValidGlobalDateAndTimeString = isValidGlobalDateAndTimeString;
-  jQuery.microdata.isValidDateString = isValidDateString;
+  $.microdata.isValidGlobalDateAndTimeString = isValidGlobalDateAndTimeString;
+  $.microdata.isValidDateString = isValidDateString;
 
   function splitTokens(s) {
     if (s && /\S/.test(s))
@@ -71,14 +73,14 @@
   function getItems(types) {
     var doc = this[0];
     if (doc.getItems)
-      return jQuery(types ? doc.getItems(types) : doc.getItems());
-    var selector = jQuery.map(splitTokens(types), function(t) {
+      return $(types ? doc.getItems(types) : doc.getItems());
+    var selector = $.map(splitTokens(types), function(t) {
       return '[itemtype~="'+t.replace(/"/g, '\\"')+'"]';
     }).join(',') || '*';
     // filter results to only match top-level items
     // because [attr] selector doesn't work in IE we have to
     // filter the elements. http://dev.jquery.com/ticket/5637
-    return jQuery(selector, this).filter(function() {
+    return $(selector, this).filter(function() {
       return (this.getAttribute('itemscope') != null &&
               this.getAttribute('itemprop') == null);
     });
@@ -94,7 +96,7 @@
 
   function tokenList(attr) {
     return function() {
-      return jQuery(splitTokens(this.attr(attr)));
+      return $(splitTokens(this.attr(attr)));
     };
   }
 
@@ -147,11 +149,11 @@
           if (toTraverse[i] == node)
             toTraverse.splice(i--, 1);
         }
-        var $node = jQuery(node);
+        var $node = $(node);
         if (node != root) {
           var $names = $node.itemProp();
           if ($names.length) {
-            if (!name || jQuery.inArray(name, $names.toArray()) != -1)
+            if (!name || $.inArray(name, $names.toArray()) != -1)
               props.push(node);
           }
           if ($node.itemScope())
@@ -166,11 +168,11 @@
       while (context.parentNode)
         context = context.parentNode;
       $(root).itemRef().each(function(i, id) {
-        var $ref = jQuery('#'+id, context);
+        var $ref = $('#'+id, context);
         if ($ref.length)
           toTraverse.push($ref[0]);
       });
-      jQuery.unique(toTraverse);
+      $.unique(toTraverse);
 
       while (toTraverse.length) {
         traverse(toTraverse[0]);
@@ -181,13 +183,13 @@
       crawl(this[0]);
 
     // properties are already sorted in tree order
-    return jQuery(props);
+    return $(props);
   }
 
   // feature detection to use native support where available
-  var t = jQuery('<div itemscope itemtype="type" itemid="id" itemprop="prop" itemref="ref">')[0];
+  var t = $('<div itemscope itemtype="type" itemid="id" itemprop="prop" itemref="ref">')[0];
 
-  jQuery.fn.extend({
+  $.fn.extend({
     items: getItems,
     itemScope: t.itemScope ? function() {
       return this[0].itemScope;
@@ -205,16 +207,16 @@
       return resolve(this.attr('itemid'));
     },
     itemProp: t.itemProp && t.itemProp.length ? function() {
-      return jQuery(this[0].itemProp);
+      return $(this[0].itemProp);
     } : tokenList('itemprop'),
     itemRef: t.itemRef && t.itemRef.length ? function() {
-      return jQuery(this[0].itemRef);
+      return $(this[0].itemRef);
     } : tokenList('itemref'),
     itemValue: t.itemValue ? function() {
       return this[0].itemValue;
     } : itemValue,
     properties: t.properties && t.properties.namedItem ? function(name) {
-      return jQuery(name ? this[0].properties.namedItem(name) : this[0].properties);
+      return $(name ? this[0].properties.namedItem(name) : this[0].properties);
     } : properties
   });
 })();
