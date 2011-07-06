@@ -2,24 +2,36 @@
 
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#json
 jQuery.microdata.json = function(selector, format) {
-  function getObject($item) {
+  // Implemented as per spec, with the addition that a stack of
+  // elements is maintained to break itemref loops. The branch is cut
+  // just before the item would be included a second time.
+
+  var $ = jQuery;
+
+  function getObject(item, stack) {
+    var $item = $(item);
     var result = {};
     if ($item.itemType())
       result.type = $item.itemType();
     if ($item.itemId())
       result.id = $item.itemId();
     result.properties = {};
-    $item.properties().each(function() {
-      var $elem = jQuery(this);
+    $item.properties().each(function(i, elem) {
+      var $elem = $(elem);
       var value;
-      if ($elem.itemScope())
-        value = getObject($elem);
-      else
+      if ($elem.itemScope()) {
+        if (stack.indexOf(elem) != -1)
+          return;
+        stack.push(elem);
+        value = getObject(elem, stack);
+        stack.pop();
+      } else {
         value = $elem.itemValue();
-      $elem.itemProp().each(function() {
-        if (!result.properties[this])
-          result.properties[this] = [];
-        result.properties[this].push(value);
+      }
+      $elem.itemProp().each(function(i, prop) {
+        if (!result.properties[prop])
+          result.properties[prop] = [];
+        result.properties[prop].push(value);
       });
     });
     return result;
@@ -27,11 +39,11 @@ jQuery.microdata.json = function(selector, format) {
 
   var result = {};
   result.items = [];
-  var $items = selector ? jQuery(selector) : jQuery(document).items();
+  var $items = selector ? $(selector) : $(document).items();
   $items.each(function(i, item) {
-    var $item = jQuery(item);
+    var $item = $(item);
     if ($item.itemScope())
-      result.items.push(getObject($item));
+      result.items.push(getObject(item, []));
   });
   return format ? format(result) : JSON.stringify(result, undefined, 2);
 };
