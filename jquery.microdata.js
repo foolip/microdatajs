@@ -180,7 +180,8 @@
     if (this.itemScope())
       crawl(this[0]);
 
-    return jQuery(jQuery.unique(props));
+    // properties are already sorted in tree order
+    return jQuery(props);
   }
 
   // feature detection to use native support where available
