@@ -212,6 +212,8 @@
     itemValue: t.itemValue ? function() {
       return this[0].itemValue;
     } : itemValue,
-    properties: properties
+    properties: t.properties && t.properties.namedItem ? function(name) {
+      return jQuery(name ? this[0].properties.namedItem(name) : this[0].properties);
+    } : properties
   });
 })();
