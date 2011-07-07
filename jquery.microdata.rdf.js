@@ -135,7 +135,7 @@
   }
 
   // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#generate-the-triples-for-an-item
-  function generateItemTriples(item, triples, memory, fallbackType) {
+  function generateItemTriples(item, triples, memory, fallbackType, stack) {
     var $item = $(item);
     var subject;
     $.each(memory, function(i, m) {
@@ -144,7 +144,11 @@
         return false;
       }
     });
-    if (!subject) {
+    if (subject) {
+      // itemref loop handling
+      if (stack.indexOf(item != -1))
+        return subject;
+    } else {
       subject = isAbsoluteURL($item.itemId()) ? new URI($item.itemId()) : new URI(/*blank*/);
       memory.push({item: item, subject: subject});
     }
@@ -168,7 +172,11 @@
           return;
         var value;
         if ($prop.itemScope()) {
-          value = generateItemTriples(prop, triples, memory, type);
+          if (!stack)
+            stack = [];
+          stack.push(item);
+          value = generateItemTriples(prop, triples, memory, type, stack);
+          stack.pop();
         } else if (/^A|AREA|AUDIO|EMBED|IFRAME|IMG|LINK|OBJECT|SOURCE|TRACK|VIDEO$/.test(prop.tagName.toUpperCase())) {
           value = new URI($prop.itemValue());
         } else {
