@@ -22,7 +22,7 @@ jQuery.microdata.json = function(selector, format) {
       if ($elem.itemScope()) {
         if (stack.indexOf(elem) != -1)
           return;
-        stack.push(elem);
+        stack.push(item);
         value = getObject(elem, stack);
         stack.pop();
       } else {
