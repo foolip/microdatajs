@@ -1,6 +1,6 @@
 /* -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 
-// http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#json
+// http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#json
 jQuery.microdata.json = function(selector, format) {
   // Implemented as per spec, with the addition that a stack of
   // elements is maintained to break itemref loops. The branch is cut

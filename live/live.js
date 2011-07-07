@@ -57,7 +57,7 @@ function updateTab(iframe, index) {
         $vcard.append(downloadIt('text/directory;profile=vCard', vcardText));
       });
     } else {
-      $vcard.append(noItems('vCard', vcardURI, 'http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#vcard'));
+      $vcard.append(noItems('vCard', vcardURI, 'http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#vcard'));
     }
     break;
   case 4: // iCal
@@ -68,7 +68,7 @@ function updateTab(iframe, index) {
       $ical.append(pre(icalText));
       $ical.append(downloadIt('text/calendar;componenet=vevent', icalText));
     } else {
-      $ical.append(noItems('vEvent', veventURI, 'http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#vevent'));
+      $ical.append(noItems('vEvent', veventURI, 'http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#vevent'));
     }
     break;
   }

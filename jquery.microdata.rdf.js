@@ -1,6 +1,6 @@
 /* -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 
-// http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#rdf
+// http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#rdf
 (function() {
   var $ = jQuery;
 
@@ -62,7 +62,7 @@
     return undefined;
   }
 
-  // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#extracting-rdf
+  // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#extracting-rdf
   function extractDocumentTriples(triples) {
     var $title = $('title').first();
     if ($title.length == 1)
@@ -134,7 +134,7 @@
     });
   }
 
-  // http://www.whatwg.org/specs/web-apps/current-work/multipage/links.html#generate-the-triples-for-an-item
+  // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#generate-the-triples-for-an-item
   function generateItemTriples(item, triples, memory, fallbackType, stack) {
     var $item = $(item);
     var subject;
