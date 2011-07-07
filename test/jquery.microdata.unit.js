@@ -12,7 +12,7 @@ test('jQuery.fn.items', function() {
          $.map(expected, function(id) { return document.getElementById(id); }),
          msg);
   }
-  t(document, undefined, ['w', 'x', 'dupref', 'loops', 'ioItem', 'dupprops']);
+  t(document, undefined, ['w', 'x', 'dupref', 'loops', 'ioItem', 'dupprops', 'noprops']);
   t('#x', undefined, []);
   t('#io', undefined, ['ioItem']);
   t(document, 'http://n.whatwg.org/work', ['w', 'x']);
@@ -43,6 +43,7 @@ test('jQuery.fn.properties', function() {
   t('#dupprops', undefined, ['foo0', 'bar0', 'bar1', 'foo1']);
   t('#dupprops', 'foo', ['foo0', 'foo1']);
   t('#dupprops', 'bar', ['bar0', 'bar1']);
+  t('#noprops', undefined, []);
 });
 
 function testStringReflection($elm, attr, func, attrString, funcString) {

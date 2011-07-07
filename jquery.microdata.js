@@ -134,56 +134,75 @@
   }
 
   function properties(name) {
-    // Find all elements that add properties to the item, optionally
-    // filtered by a property name. Look in the subtrees rooted at the
-    // item itself and any itemref'd elements. An item can never have
-    // itself as a property, but circular reference is possible.
+    if (!this.itemScope())
+      return $();
 
-    var props = [];
+    var root = this[0];
 
-    function crawl(root) {
-      var toTraverse = [root];
+    // 1. Let results, memory, and pending be empty lists of elements.
+    var results = [];
+    var memory = [];
+    var pending = [];
 
-      function traverse(node) {
-        for (var i = 0; i < toTraverse.length; i++) {
-          if (toTraverse[i] == node)
-            toTraverse.splice(i--, 1);
-        }
-        var $node = $(node);
-        if (node != root) {
-          var $names = $node.itemProp();
-          if ($names.length) {
-            if (!name || $names.toArray().indexOf(name) != -1)
-              props.push(node);
-          }
-          if ($node.itemScope())
-            return;
-        }
-        $node.children().each(function() {
-          traverse(this);
-        });
-      }
-
-      var context = root;
-      while (context.parentNode)
-        context = context.parentNode;
-      $(root).itemRef().each(function(i, id) {
-        var $ref = $('#'+id, context);
-        if ($ref.length)
-          toTraverse.push($ref[0]);
+    function addChildren(elm) {
+      $(elm).children().each(function(i, child) {
+        pending.push(child);
       });
-      $.unique(toTraverse);
-
-      while (toTraverse.length) {
-        traverse(toTraverse[0]);
-      }
     }
 
-    if (this.itemScope())
-      crawl(this[0]);
+    // 2. Add the element root to memory.
+    memory.push(root);
 
-    // properties are already sorted in tree order
-    return $(props);
+    // 3. Add the child elements of root, if any, to pending.
+    addChildren(root);
+
+    // 4. If root has an itemref attribute, split the value of that
+    // itemref attribute on spaces. For each resulting token ID, if
+    // there is an element in the home subtree of root with the ID ID,
+    // then add the first such element to pending.
+    var context = root;
+    while (context.parentNode)
+      context = context.parentNode;
+    $(root).itemRef().each(function(i, id) {
+      var $ref = $('#'+id, context);
+      if ($ref.length)
+        pending.push($ref[0]);
+    });
+
+    // 5. Loop: If pending is empty, jump to the step labeled end of loop.
+    while (pending.length) {
+      // 6. Remove an element from pending and let current be that element.
+      var current = pending.pop();
+
+      // 7. If current is already in memory, there is a microdata
+      // error; return to the step labeled loop.
+      if (memory.indexOf(current) != -1)
+        continue;
+
+      // 8. Add current to memory.
+      memory.push(current);
+
+      // 9. If current does not have an itemscope attribute, then: add
+      // all the child elements of current to pending.
+      if (!$(current).itemScope())
+        addChildren(current);
+
+      // 10. If current has an itemprop attribute specified, add it to results.
+      // SPEC VIOLATION: itemprop="" does not add to results
+      var $names = $(current).itemProp();
+      if ($names.length) {
+        if (!name || $names.toArray().indexOf(name) != -1)
+          results.push(current);
+      }
+
+      // 11. Return to the step labeled loop.
+    }
+
+    // 12. End of loop: Sort results in tree order.
+    $.unique(results);
+
+    // 13. Return results.
+    return $(results);
   }
 
   // feature detection to use native support where available
