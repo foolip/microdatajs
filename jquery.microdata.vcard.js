@@ -6,7 +6,7 @@ jQuery.microdata.vcard = function(selector) {
 
   var vcardURI = 'http://microformats.org/profile/hcard';
 
-  function extract($vcard) {
+  function extract($vcard, memory) {
     var output = '';
     // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#add-a-vcard-line
     function addLine(type, params, value) {
@@ -94,7 +94,13 @@ jQuery.microdata.vcard = function(selector) {
                 value += ';' + escapeString($(this).itemValue());
             });
           } else if (name == 'agent' && $subitem.itemType() == vcardURI) {
-            value = escapeString(extract($subitem));
+            if (memory.indexOf($subitem[0]) != -1) {
+              value = 'ERROR';
+            } else {
+              memory.push($vcard[0]);
+              value = escapeString(extract($subitem, memory));
+              memory.pop();
+            }
             addParam('VALUE', 'VCARD');
           } else {
             // the property's value is an item and name is none of the above
@@ -131,5 +137,5 @@ jQuery.microdata.vcard = function(selector) {
                 }) :
                 $(document).items(vcardURI)).first();
   if ($vcard.length == 1)
-    return extract($vcard);
+    return extract($vcard, []);
 };
