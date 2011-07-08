@@ -2,13 +2,9 @@
 
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#json
 jQuery.microdata.json = function(selector, format) {
-  // Implemented as per spec, with the addition that a stack of
-  // elements is maintained to break itemref loops. The branch is cut
-  // just before the item would be included a second time.
-
   var $ = jQuery;
 
-  function getObject(item, stack) {
+  function getObject(item, memory) {
     var $item = $(item);
     var result = {};
     if ($item.itemType())
@@ -20,11 +16,13 @@ jQuery.microdata.json = function(selector, format) {
       var $elem = $(elem);
       var value;
       if ($elem.itemScope()) {
-        if (stack.indexOf(elem) != -1)
-          return;
-        stack.push(item);
-        value = getObject(elem, stack);
-        stack.pop();
+        if (memory.indexOf(elem) != -1) {
+          value = 'ERROR';
+        } else {
+          memory.push(item);
+          value = getObject(elem, memory);
+          memory.pop();
+        }
       } else {
         value = $elem.itemValue();
       }
@@ -45,5 +43,5 @@ jQuery.microdata.json = function(selector, format) {
     if ($item.itemScope())
       result.items.push(getObject(item, []));
   });
-  return format ? format(result) : JSON.stringify(result, undefined, 2);
+  return format ? format(result) : JSON.stringify(result);
 };

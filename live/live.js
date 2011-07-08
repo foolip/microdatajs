@@ -34,7 +34,7 @@ function updateTab(iframe, index) {
   switch (index) {
   case 1: // JSON
     var $json = $('#json').empty();
-    var jsonText = $.microdata.json($doc.items());
+    var jsonText = $.microdata.json($doc.items(), function(o) { return JSON.stringify(o, undefined, 2); });
     $json.append(pre(jsonText));
     $json.append(downloadIt('application/json', jsonText));
     break;
