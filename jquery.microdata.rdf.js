@@ -129,29 +129,25 @@
     $(document).items().each(function(i, item) {
       var t = new Triple(new URI(document.location.href),
                          new URI('http://www.w3.org/1999/xhtml/microdata#item'),
-                         generateItemTriples(item, triples, memory));
+                         generateItemTriples(triples, item, memory));
       triples.push(t);
     });
   }
 
   // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#generate-the-triples-for-an-item
-  function generateItemTriples(item, triples, memory, fallbackType, stack) {
+  function generateItemTriples(triples, item, memory, fallbackType) {
     var $item = $(item);
     var subject;
-    $.each(memory, function(i, m) {
-      if (m.item == item) {
-        subject = m.subject;
+    $.each(memory, function(i, e) {
+      if (e.item == item) {
+        subject = e.subject;
         return false;
       }
     });
-    if (subject) {
-      // itemref loop handling
-      if (stack.indexOf(item != -1))
-        return subject;
-    } else {
-      subject = isAbsoluteURL($item.itemId()) ? new URI($item.itemId()) : new URI(/*blank*/);
-      memory.push({item: item, subject: subject});
-    }
+    if (subject)
+      return subject;
+    subject = isAbsoluteURL($item.itemId()) ? new URI($item.itemId()) : new URI(/*blank*/);
+    memory.push({item: item, subject: subject});
     var type = '';
     if (isAbsoluteURL($item.itemType())) {
       type = $item.itemType();
@@ -172,11 +168,7 @@
           return;
         var value;
         if ($prop.itemScope()) {
-          if (!stack)
-            stack = [];
-          stack.push(item);
-          value = generateItemTriples(prop, triples, memory, type, stack);
-          stack.pop();
+          value = generateItemTriples(triples, prop, memory, type);
         } else if (/^A|AREA|AUDIO|EMBED|IFRAME|IMG|LINK|OBJECT|SOURCE|TRACK|VIDEO$/.test(prop.tagName.toUpperCase())) {
           value = new URI($prop.itemValue());
         } else {
@@ -263,7 +255,7 @@
     if (selector) {
       var memory = [];
       $(selector).each(function(i, item) {
-        generateItemTriples(item, triples, memory);
+        generateItemTriples(triples, item, memory);
       });
     } else {
       extractDocumentTriples(triples);
