@@ -153,7 +153,7 @@
         if (node != root) {
           var $names = $node.itemProp();
           if ($names.length) {
-            if (!name || $names.toArray().indexOf(name) != -1)
+            if (!name || $.inArray(name, $names.toArray()) != -1)
               props.push(node);
           }
           if ($node.itemScope())

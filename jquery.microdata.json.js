@@ -16,7 +16,7 @@ jQuery.microdata.json = function(selector, format) {
       var $elem = $(elem);
       var value;
       if ($elem.itemScope()) {
-        if (memory.indexOf(elem) != -1) {
+        if ($.inArray(elem, memory) != -1) {
           value = 'ERROR';
         } else {
           memory.push(item);

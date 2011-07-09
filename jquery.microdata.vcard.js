@@ -94,7 +94,7 @@ jQuery.microdata.vcard = function(selector) {
                 value += ';' + escapeString($(this).itemValue());
             });
           } else if (name == 'agent' && $subitem.itemType() == vcardURI) {
-            if (memory.indexOf($subitem[0]) != -1) {
+            if ($.inArray($subitem[0], memory) != -1) {
               value = 'ERROR';
             } else {
               memory.push($vcard[0]);

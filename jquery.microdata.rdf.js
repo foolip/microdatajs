@@ -200,7 +200,7 @@
         for (name in $.microdata.rdf.prefix) {
           var uri = $.microdata.rdf.prefix[name];
           if (term.uri.substr(0, uri.length) == uri) {
-            if (used.indexOf(name) == -1)
+            if ($.inArray(name, used) == -1)
               used.push(name);
             return name+':'+term.uri.substr(uri.length);
           }
