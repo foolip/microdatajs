@@ -140,6 +140,10 @@ test('source', function() {
   testStringReflection($('<source itemprop>'), 'src', 'itemValue', '#foo', window.location.href+'#foo');
 });
 
+test('track', function() {
+  testStringReflection($('<track itemprop>'), 'src', 'itemValue', '#foo', window.location.href+'#foo');
+});
+
 test('video', function() {
   testStringReflection($('<video itemprop></video>'), 'src', 'itemValue', '#foo', window.location.href+'#foo');
 });
