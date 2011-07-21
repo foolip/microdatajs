@@ -25,52 +25,69 @@ function downloadIt(mime, data) {
   return $('<a class="download" href="data:'+mime+';charset=UTF-8,'+encodeURI(data)+'">Download it!</a>');
 }
 
-function noItems(name, itemtype, spec) {
-  return $('<i>No <a href="'+spec+'">'+name+'</a> items (items with <code>itemtype="'+itemtype+'"</code>)</i>');
-}
-
 function updateTab(iframe, index) {
-  var $doc = $(iframe.contentWindow.document);
-  switch (index) {
-  case 1: // JSON
-    var $json = $('#json').empty();
-    var jsonText = $.microdata.json($doc.items(), function(o) { return JSON.stringify(o, undefined, 2); });
-    $json.append(pre(jsonText));
-    $json.append(downloadIt('application/json', jsonText));
-    break;
-  case 2: // Turtle
-    var $turtle = $('#turtle').empty();
-    var turtleText = $.microdata.turtle($doc.items());
-    $turtle.append(pre(turtleText));
-    $turtle.append(downloadIt('text/turtle', turtleText));
-    break;
-  case 3: // vCard
-    var vcardURI = 'http://microformats.org/profile/hcard';
-    var $vcard = $('#vcard').empty();
-    var $vcards = $doc.items(vcardURI);
-    if ($vcards.length > 0) {
-      $vcards.each(function(i, node) {
-        var vcardText = $.microdata.vcard(node);
-        if (i > 0)
-          $vcard.append(document.createElement('hr'));
-        $vcard.append(pre(vcardText));
-        $vcard.append(downloadIt('text/directory;profile=vCard', vcardText));
-      });
-    } else {
-      $vcard.append(noItems('vCard', vcardURI, 'http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#vcard'));
+  var tabs = [
+    {
+      id: 'json',
+      name: 'top-level',
+      spec: 'top-level-microdata-items',
+      update: function($tab, $items) {
+        var jsonText = $.microdata.json($items, function(o) { return JSON.stringify(o, undefined, 2); });
+        $tab.append(pre(jsonText));
+        $tab.append(downloadIt('application/json', jsonText));
+      }
+    },
+    {
+      id: 'turtle',
+      name: 'top-level',
+      spec: 'top-level-microdata-items',
+      update: function($tab, $items) {
+        var turtleText = $.microdata.turtle($items);
+        $tab.append(pre(turtleText));
+        $tab.append(downloadIt('text/turtle', turtleText));
+      }
+    },
+    {
+      id: 'vcard',
+      type: 'http://microformats.org/profile/hcard',
+      name: 'vCard',
+      spec: 'vcard',
+      update: function($tab, $items) {
+        $items.each(function(i, node) {
+          var vcardText = $.microdata.vcard(node);
+          if (i > 0)
+            $tab.append(document.createElement('hr'));
+          $tab.append(pre(vcardText));
+          $tab.append(downloadIt('text/directory;profile=vCard', vcardText));
+        });
+      }
+    },
+    {
+      id: 'ical',
+      type: 'http://microformats.org/profile/hcalendar#vevent',
+      name: 'vEvent',
+      spec: 'vevent',
+      update: function($tab, $items) {
+        $items.each(function(i, node) {
+          var icalText = $.microdata.ical(node);
+          if (i > 0)
+            $tab.append(document.createElement('hr'));
+          $tab.append(pre(icalText));
+          $tab.append(downloadIt('text/calendar;componenet=vevent', icalText));
+        });
+      }
     }
-    break;
-  case 4: // iCal
-    var veventURI = 'http://microformats.org/profile/hcalendar#vevent';
-    var $ical = $('#ical').empty();
-    var icalText = $.microdata.ical($doc.items(veventURI));
-    if (icalText) {
-      $ical.append(pre(icalText));
-      $ical.append(downloadIt('text/calendar;componenet=vevent', icalText));
+  ];
+
+  var tab = tabs[index-1];
+  if (tab) {
+    var $tab = $('#'+tab.id).empty();
+    var $items = $(iframe.contentWindow.document).items(tab.type);
+    if ($items.length > 0) {
+      tab.update($tab, $items);
     } else {
-      $ical.append(noItems('vEvent', veventURI, 'http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#vevent'));
+      $tab.append($('<i>No <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#'+tab.spec+'">'+tab.name+'</a> items found</i>'));
     }
-    break;
   }
 }
 
