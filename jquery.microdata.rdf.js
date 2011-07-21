@@ -55,7 +55,7 @@
   }
 
   function getLang($elem) {
-    for (; $elem[0]; $elem = $elem.parent()) {
+    for (; $elem[0].getAttribute; $elem = $elem.parent()) {
       if ($elem.attr('lang'))
         return $elem.attr('lang');
     }
