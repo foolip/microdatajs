@@ -4,6 +4,13 @@ function update(iframe, html) {
   // update preview
   var doc = iframe.contentWindow.document;
   doc.open();
+  // new non-void elements in HTML5. IE parses these as void elements
+  // unless one has previously called createElement for it.
+  $.each(['section', 'article', 'aside', 'hgroup', 'header', 'footer',
+          'nav', 'figure', 'figcaption', 'video', 'audio', 'mark',
+          'progress', 'meter', 'time', 'ruby', 'rt', 'rp', 'bdi',
+          'canvas', 'details', 'datalist', 'output'],
+         function(i, tagName) { doc.createElement(tagName); });
   // shrink iframe to max(150, height) (replace with <iframe seamless>?)
   $(iframe.contentWindow).load(function() {
     $(iframe).height(150);
