@@ -77,7 +77,7 @@
     var selector = $.map(splitTokens(types), function(t) {
       return '[itemtype~="'+t.replace(/"/g, '\\"')+'"]';
     }).join(',') || '*';
-    // filter results to only match top-level items
+    // filter results to only match top-level items.
     // because [attr] selector doesn't work in IE we have to
     // filter the elements. http://dev.jquery.com/ticket/5637
     return $(selector, this).filter(function() {
