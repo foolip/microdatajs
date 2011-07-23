@@ -86,12 +86,31 @@
     });
   }
 
-  function resolve(url) {
+  // find the furthest ancestor (usually Document)
+  function ancestor(node) {
+    while (node.parentNode)
+      node = node.parentNode;
+    return node;
+  }
+
+  function resolve(elm, attr) {
+    // in order to handle <base> and attributes which aren't properly
+    // reflected as URLs, insert a temporary <img> element just before
+    // elm and resolve using its src attribute. the <img> element must
+    // be created using the parent document due IE security policy.
+    var url = elm.getAttribute(attr);
     if (!url)
       return '';
-    var img = document.createElement('img');
+    var a = ancestor(elm);
+    var p = elm.parentNode;
+    var img = (a.createElement ? a : document).createElement('img');
     img.setAttribute('src', url);
-    return img.src;
+    if (p)
+      p.insertBefore(img, elm);
+    url = img.src;
+    if (p)
+      p.removeChild(img);
+    return url;
   }
 
   function tokenList(attr) {
@@ -117,13 +136,13 @@
     case 'SOURCE':
     case 'TRACK':
     case 'VIDEO':
-      return resolve(this.attr('src'));
+      return resolve(elm, 'src');
     case 'A':
     case 'AREA':
     case 'LINK':
-      return resolve(this.attr('href'));
+      return resolve(elm, 'href');
     case 'OBJECT':
-      return resolve(this.attr('data'));
+      return resolve(elm, 'data');
     case 'TIME':
       var datetime = this.attr('datetime');
       if (!(datetime === undefined))
@@ -164,9 +183,7 @@
         });
       }
 
-      var context = root;
-      while (context.parentNode)
-        context = context.parentNode;
+      var context = ancestor(root);
       $(root).itemRef().each(function(i, id) {
         var $ref = $('#'+id, context);
         if ($ref.length)
@@ -204,7 +221,7 @@
     itemId: t.itemId ? function() {
       return this[0].itemId;
     } : function () {
-      return resolve(this.attr('itemid'));
+      return resolve(this[0], 'itemid');
     },
     itemProp: t.itemProp && t.itemProp.length ? function() {
       return $(this[0].itemProp);
