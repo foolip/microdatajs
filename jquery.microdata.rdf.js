@@ -62,6 +62,13 @@
     return undefined;
   }
 
+  // http://www.whatwg.org/specs/web-apps/current-work/multipage/urls.html#fragment-escaped
+  function fragmentEscape(s) {
+    return s.replace(/[\"\#\%\<\>\[\\\]\^\{\|\}]/g, function(c) {
+      return '%'+c.charCodeAt(0).toString(16).toUpperCase();
+    });
+  }
+
   // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#extracting-rdf
   function extractDocumentTriples(triples) {
     var $title = $('title').first();
@@ -90,7 +97,7 @@
       for (t in tokens) {
         var predicate;
         if (t.indexOf(':') == -1)
-          predicate = 'http://www.w3.org/1999/xhtml/vocab#'+encodeURIComponent(t);
+          predicate = 'http://www.w3.org/1999/xhtml/vocab#'+fragmentEscape(t);
         else if (isAbsoluteURL(t))
           predicate = t;
         else
@@ -107,7 +114,7 @@
       var name = $meta.attr('name');
       var predicate;
       if (name.indexOf(':') == -1)
-        predicate = 'http://www.w3.org/1999/xhtml/vocab#'+encodeURIComponent(name.toLowerCase());
+        predicate = 'http://www.w3.org/1999/xhtml/vocab#'+fragmentEscape(name.toLowerCase());
       else if (isAbsoluteURL(name))
         predicate = name;
       else
@@ -178,7 +185,7 @@
         if (isAbsoluteURL(name)) {
           predicate = name;
         } else if (name.indexOf(':') == -1) {
-          predicate = 'http://www.w3.org/1999/xhtml/microdata#'+encodeURIComponent(type+name);
+          predicate = 'http://www.w3.org/1999/xhtml/microdata#'+fragmentEscape(type+name);
         }
         triples.push(new Triple(subject, new URI(predicate), value));
       });
