@@ -39,14 +39,31 @@ h1 a {
 a {
   color: #008;
 }
-.link {
-  margin-left: 8px;
+.tool {
+  display: inline;
+  margin: 0 0 0 8px;
+  padding: 0;
 }
-.link:before {
+.tool:before {
   content: "<";
+  margin-right: 1px;
+  font-size: 50%;
 }
-.link:after {
+.tool:after {
   content: ">";
+  margin-left: 1px;
+  font-size: 50%;
+}
+.tool * {
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  color: #008;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 13px;
 }
 .examples {
   display: block;

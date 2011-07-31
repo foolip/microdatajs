@@ -19,7 +19,7 @@ function update(iframe, html) {
   doc.write(html);
   doc.close();
   // update permalink
-  $('#permalink').attr('href', '?html='+encodeURIComponent(html));
+  $('.permalink a').attr('href', '?html='+encodeURIComponent(html));
   // update selected tab
   updateTab(iframe, $('#tabs').tabs('option', 'selected'));
 }
@@ -122,6 +122,10 @@ $(document).ready(function() {
       }
     });
   }
+  // validator
+  $('form.validate').submit(function() {
+    $('input[name=content]', this).val($textarea.val());
+  });
   // examples
   $('select').change(function(ev) {
     var source = ev.target.value;
