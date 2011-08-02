@@ -23,9 +23,6 @@ div.grippie {
   width: 100%;
   height: 200px;
 }
-textarea {
-  clear: both;
-}
 h1 {
   display: inline;
   font-size: 18px;
@@ -70,6 +67,19 @@ a {
   margin: 0;
   padding: 0 0 8px 0;
   float: right;
+}
+.warnings {
+  clear: both;
+  font-size: 16px;
+}
+.warnings p {
+  background: #fcc;
+  padding: 4px;
+  margin: 8px 0;
+}
+.warnings p:before {
+  content: "Warning: ";
+  font-weight: bold;
 }
 iframe {
   border: none;

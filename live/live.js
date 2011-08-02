@@ -98,8 +98,14 @@ function updateTab(iframe, index) {
   }
 }
 
-$(document).ready(function() {
+$(window).load(function() {
   var iframe = document.getElementsByTagName('iframe')[0];
+  // detect parsing bugs
+  $('.child', iframe.contentWindow.document).each(function(i, elm) {
+    if (elm.parentNode.className != 'parent') {
+      $('.warnings').append($('<p>Your browser moves <code>&lt;'+elm.tagName.toLowerCase()+'></code> elements during parsing; some examples will not work correctly!</p>'));
+    }
+  });
   // textarea
   var $textarea = $('textarea');
   $textarea.TextAreaResizer();
