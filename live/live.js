@@ -130,7 +130,15 @@ $(window).load(function() {
   }
   // validator
   $('form.validate').submit(function() {
-    $('input[name=content]', this).val($textarea.val());
+    // add <!doctype> and <title> if possible
+    var doc = iframe.contentWindow.document;
+    var prefix = '';
+    if (doc.firstChild.publicId == undefined) {
+      prefix += '<!doctype html>\n';
+      if (doc.getElementsByTagName('title').length == 0)
+        prefix += '<title></title>\n';
+    }
+    $('input[name=content]', this).val(prefix + $textarea.val());
   });
   // examples
   $('select').change(function(ev) {
