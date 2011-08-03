@@ -5,7 +5,7 @@
  <link itemprop="bookFormat" href="http://schema.org/Paperback">Mass Market Paperback
 by <a itemprop="author" href="/author/jd_salinger.html">J.D. Salinger</a>
 
-<div itemprop="aggregateRating"  itemtype="http://schema.org/AggregateRating">
+<div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
   <span itemprop="ratingValue">4</span> stars -
   <span itemprop="reviewCount">3077</span> reviews
 </div>
