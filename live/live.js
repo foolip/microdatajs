@@ -45,16 +45,6 @@ function updateTab(iframe, index) {
       }
     },
     {
-      id: 'turtle',
-      name: 'top-level',
-      spec: 'top-level-microdata-items',
-      update: function($tab, $items) {
-        var turtleText = $.microdata.turtle($items);
-        $tab.append(pre(turtleText));
-        $tab.append(downloadIt('text/turtle', turtleText));
-      }
-    },
-    {
       id: 'vcard',
       type: 'http://microformats.org/profile/hcard',
       name: 'vCard',
