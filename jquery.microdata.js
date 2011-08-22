@@ -104,12 +104,17 @@
     var a = ancestor(elm);
     var p = elm.parentNode;
     var img = (a.createElement ? a : document).createElement('img');
-    img.setAttribute('src', url);
-    if (p)
-      p.insertBefore(img, elm);
-    url = img.src;
-    if (p)
-      p.removeChild(img);
+    try {
+      img.setAttribute('src', url);
+      if (p)
+        p.insertBefore(img, elm);
+      url = img.src;
+      if (p)
+        p.removeChild(img);
+    } catch (e) {
+      // IE>6 throws "TypeError: Access is denied." for mailto:
+      // URLs. This is annoying, but harmless to ignore.
+    }
     return url;
   }
 
