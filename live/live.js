@@ -18,6 +18,10 @@ function update(iframe, html) {
   });
   doc.write(html);
   doc.close();
+  // insert <base href> to make shorter/prettier URLs in output
+  if ($('base[href]', doc).length == 0) {
+    $('head', doc).append($('<base href="http://example.com/">', doc));
+  }
   // update permalink
   $('.permalink a').attr('href', '?html='+encodeURIComponent(html));
   // update selected tab
