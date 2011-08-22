@@ -96,6 +96,7 @@ hr {
   font-weight: bold;
 }
 footer {
+  display: block;
   margin-top: 2em;
   text-align: center;
 }
