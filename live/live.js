@@ -87,7 +87,7 @@ function updateTab(iframe, index) {
     if ($items.length > 0) {
       tab.update($tab, $items);
     } else {
-      $tab.append($('<i>No <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#'+tab.spec+'">'+tab.name+'</a> items found</i>'));
+      $tab.append($('<i>No <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#'+tab.spec+'">'+tab.name+'</a> items found.</i>'));
     }
   }
 }
