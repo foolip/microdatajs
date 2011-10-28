@@ -7,8 +7,9 @@ jQuery.microdata.json = function(selector, format) {
   function getObject(item, memory) {
     var $item = $(item);
     var result = {};
-    if ($item.itemType())
-      result.type = $item.itemType();
+    var types = $item.itemType();
+    if (types.length)
+      result.type = types.toArray();
     if ($item.itemId())
       result.id = $item.itemId();
     result.properties = {};

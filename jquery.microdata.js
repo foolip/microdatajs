@@ -218,20 +218,18 @@
     } : function () {
       return this.attr('itemscope') != undefined;
     },
-    itemType: t.itemType ? function() {
-      return this[0].itemType;
-    } : function () {
-      return this.attr('itemtype') || '';
-    },
+    itemType: t.itemType && t.itemType.contains ? function() {
+      return $(this[0].itemType);
+    } : tokenList('itemtype'),
     itemId: t.itemId ? function() {
       return this[0].itemId;
     } : function () {
       return resolve(this[0], 'itemid');
     },
-    itemProp: t.itemProp && t.itemProp.length ? function() {
+    itemProp: t.itemProp && t.itemProp.contains ? function() {
       return $(this[0].itemProp);
     } : tokenList('itemprop'),
-    itemRef: t.itemRef && t.itemRef.length ? function() {
+    itemRef: t.itemRef && t.itemRef.contains ? function() {
       return $(this[0].itemRef);
     } : tokenList('itemref'),
     itemValue: t.itemValue ? function() {
