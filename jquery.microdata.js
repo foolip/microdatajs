@@ -126,7 +126,7 @@
 
   function itemValue() {
     var elm = this[0];
-    if (this.attr('itemprop') === undefined)
+    if (elm.getAttribute('itemprop') == null)
       return null;
     if (this.itemScope()) {
       return elm; // or a new jQuery object?
@@ -149,8 +149,8 @@
     case 'OBJECT':
       return resolve(elm, 'data');
     case 'TIME':
-      var datetime = this.attr('datetime');
-      if (!(datetime === undefined))
+      var datetime = elm.getAttribute('datetime');
+      if (datetime != null)
         return datetime;
     default:
       return this.text();
@@ -216,7 +216,7 @@
     itemScope: t.itemScope ? function() {
       return this[0].itemScope;
     } : function () {
-      return this.attr('itemscope') != undefined;
+      return this[0].getAttribute('itemscope') != null;
     },
     itemType: t.itemType && t.itemType.contains ? function() {
       return $(this[0].itemType);
