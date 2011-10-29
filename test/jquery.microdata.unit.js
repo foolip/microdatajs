@@ -77,12 +77,12 @@ test('jQuery.fn.itemType', function() {
   }
   // Note: com.example.Thing is not a valid itemtype, it's here just
   // to verify that itemtype is not resolved as a URL.
-  t('<span>', []);
-  t('<span itemtype="http://example.com/Thing">', ['http://example.com/Thing']);
-  t('<span itemtype="http://example.com/Thing com.example.Thing">', ['http://example.com/Thing', 'com.example.Thing']);
-  t('<span itemtype="com.example.Thing http://example.com/Thing">', ['com.example.Thing', 'http://example.com/Thing']);
-  t('<span itemtype="http://example.com/Thing http://example.com/Thing">', ['http://example.com/Thing', 'http://example.com/Thing']);
-  t('<span itemtype="http://example.com/Thing com.example.Thing http://example.com/Thing">', ['http://example.com/Thing', 'com.example.Thing', 'http://example.com/Thing']);
+  t('<meta>', []);
+  t('<meta itemtype="http://example.com/Thing">', ['http://example.com/Thing']);
+  t('<meta itemtype="http://example.com/Thing com.example.Thing">', ['http://example.com/Thing', 'com.example.Thing']);
+  t('<meta itemtype="com.example.Thing http://example.com/Thing">', ['com.example.Thing', 'http://example.com/Thing']);
+  t('<meta itemtype="http://example.com/Thing http://example.com/Thing">', ['http://example.com/Thing', 'http://example.com/Thing']);
+  t('<meta itemtype="http://example.com/Thing com.example.Thing http://example.com/Thing">', ['http://example.com/Thing', 'com.example.Thing', 'http://example.com/Thing']);
 });
 
 test('jQuery.fn.itemId', function() {
@@ -95,24 +95,24 @@ test('jQuery.fn.itemProp', function() {
   function t(html, expected) {
     same($(html).itemProp().toArray(), expected);
   }
-  t('<span>', []);
-  t('<span itemprop="do">', ['do']);
-  t('<span itemprop="do re">', ['do', 're']);
-  t('<span itemprop="re do">', ['re', 'do']);
-  t('<span itemprop="do do">', ['do', 'do']);
-  t('<span itemprop="do re do">', ['do', 're', 'do']);
+  t('<meta>', []);
+  t('<meta itemprop="do">', ['do']);
+  t('<meta itemprop="do re">', ['do', 're']);
+  t('<meta itemprop="re do">', ['re', 'do']);
+  t('<meta itemprop="do do">', ['do', 'do']);
+  t('<meta itemprop="do re do">', ['do', 're', 'do']);
 });
 
 test('jQuery.fn.itemRef', function() {
   function t(html, expected) {
     same($(html).itemRef().toArray(), expected);
   }
-  t('<span>', []);
-  t('<span itemref="do">', ['do']);
-  t('<span itemref="do re">', ['do', 're']);
-  t('<span itemref="re do">', ['re', 'do']);
-  t('<span itemref="do do">', ['do', 'do']);
-  t('<span itemref="do re do">', ['do', 're', 'do']);
+  t('<meta>', []);
+  t('<meta itemref="do">', ['do']);
+  t('<meta itemref="do re">', ['do', 're']);
+  t('<meta itemref="re do">', ['re', 'do']);
+  t('<meta itemref="do do">', ['do', 'do']);
+  t('<meta itemref="do re do">', ['do', 're', 'do']);
 });
 
 module('jQuery.fn.itemValue');
