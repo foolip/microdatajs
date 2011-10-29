@@ -117,7 +117,11 @@
 
   function tokenList(attr) {
     return function() {
-      return $(splitTokens(this.attr(attr)));
+      var list = splitTokens(this.attr(attr));
+      list.contains = function(token) {
+        return $.inArray(token, this) != -1;
+      };
+      return list;
     };
   }
 
@@ -172,9 +176,9 @@
         }
         var $node = $(node);
         if (node != root) {
-          var $names = $node.itemProp();
-          if ($names.length) {
-            if (!name || $.inArray(name, $names.toArray()) != -1)
+          var names = $node.itemProp();
+          if (names.length) {
+            if (!name || names.contains(name))
               props.push(node);
           }
           if ($node.itemScope())
@@ -186,7 +190,7 @@
       }
 
       var context = ancestor(root);
-      $(root).itemRef().each(function(i, id) {
+      $.each($(root).itemRef(), function(i, id) {
         var $ref = $('#'+id, context);
         if ($ref.length)
           toTraverse.push($ref[0]);
@@ -221,7 +225,7 @@
       return this[0].getAttribute('itemscope') != null;
     },
     itemType: t.itemType && t.itemType.contains ? function() {
-      return $(this[0].itemType);
+      return this[0].itemType;
     } : tokenList('itemtype'),
     itemId: t.itemId ? function() {
       return this[0].itemId;
@@ -229,10 +233,10 @@
       return resolve(this[0], 'itemid');
     },
     itemProp: t.itemProp && t.itemProp.contains ? function() {
-      return $(this[0].itemProp);
+      return this[0].itemProp;
     } : tokenList('itemprop'),
     itemRef: t.itemRef && t.itemRef.contains ? function() {
-      return $(this[0].itemRef);
+      return this[0].itemRef;
     } : tokenList('itemref'),
     itemValue: t.itemValue ? function() {
       return this[0].itemValue;

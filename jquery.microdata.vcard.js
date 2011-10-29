@@ -46,7 +46,7 @@ jQuery.microdata.vcard = function(selector) {
       addLine("UID", [], escapeString($vcard.itemId()));
     $vcard.properties().each(function() {
       var $prop = $(this);
-      $prop.itemProp().each(function() {
+      $.each($prop.itemProp(), function() {
         var name = this;
         var params = [];
         var value;
@@ -93,7 +93,7 @@ jQuery.microdata.vcard = function(selector) {
               if (!$(this).itemScope())
                 value += ';' + escapeString($(this).itemValue());
             });
-          } else if (name == 'agent' && $subitem.itemType() == vcardURI) {
+          } else if (name == 'agent' && $subitem.itemType().contains(vcardURI)) {
             if ($.inArray($subitem[0], memory) != -1) {
               value = 'ERROR';
             } else {
@@ -133,7 +133,7 @@ jQuery.microdata.vcard = function(selector) {
   var $vcard = (selector ?
                 $(selector).filter(function() {
                   var $this = $(this);
-                  return $this.itemScope() && $this.itemType() == vcardURI;
+                  return $this.itemScope() && $this.itemType().contains(vcardURI);
                 }) :
                 $(document).items(vcardURI)).first();
   if ($vcard.length == 1)

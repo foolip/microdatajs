@@ -9,7 +9,7 @@ jQuery.microdata.json = function(selector, format) {
     var result = {};
     var types = $item.itemType();
     if (types.length)
-      result.type = types.toArray();
+      result.type = $(types).toArray();
     if ($item.itemId())
       result.id = $item.itemId();
     result.properties = {};
@@ -27,7 +27,7 @@ jQuery.microdata.json = function(selector, format) {
       } else {
         value = $elem.itemValue();
       }
-      $elem.itemProp().each(function(i, prop) {
+      $.each($elem.itemProp(), function(i, prop) {
         if (!result.properties[prop])
           result.properties[prop] = [];
         result.properties[prop].push(value);

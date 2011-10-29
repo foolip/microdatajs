@@ -8,7 +8,7 @@ jQuery.microdata.ical = function(selector) {
   var $events = selector ?
     $(selector).filter(function() {
       var $this = $(this);
-      return $this.itemScope() && $this.itemType() == veventURI;
+      return $this.itemScope() && $this.itemType().contains(veventURI);
     }) :
     $(document).items(veventURI);
   if ($events.length == 0)
@@ -50,7 +50,7 @@ jQuery.microdata.ical = function(selector) {
       var $elem = $(this);
       if ($elem.itemScope())
         return;
-      $elem.itemProp().each(function() {
+      $.each($elem.itemProp(), function() {
         var name = this;
         if ($elem.get(0).tagName.toUpperCase() == 'TIME') {
           var value = $elem.itemValue().replace(/[-:]/g, '');

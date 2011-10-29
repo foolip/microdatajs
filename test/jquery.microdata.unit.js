@@ -47,6 +47,28 @@ test('jQuery.fn.properties', function() {
   t('#noprops', undefined, []);
 });
 
+function testTokenListReflection(elm, attr, func) {
+  var $elm = $(document.createElement(elm));
+
+  function t(tokens) {
+    var attrVal = tokens.join(' \t\n\f\r');
+    $elm.attr(attr, attrVal);
+    var list = $elm[func]();
+    same($(list).toArray(), tokens);
+    $.each(tokens, function(i, token) {
+      ok(list.contains(token));
+    });
+  }
+
+  t([]);
+  t(['a']);
+  t(['a', 'b']);
+  t(['b', 'a']);
+  t(['a', 'a']);
+  t(['a', 'b', 'a']);
+  t(['com.example.Thing', 'http://example.com/Thing']);
+}
+
 function testStringReflection($elm, attr, func, attrString, funcString) {
   // attrString is the content attribute value, while funcString is
   // the expected value when getting the property (if given)
@@ -73,17 +95,7 @@ test('jQuery.fn.itemScope', function() {
 });
 
 test('jQuery.fn.itemType', function() {
-  function t(html, expected) {
-    same($(html).itemType().toArray(), expected);
-  }
-  // Note: com.example.Thing is not a valid itemtype, it's here just
-  // to verify that itemtype is not resolved as a URL.
-  t('<meta>', []);
-  t('<meta itemtype="http://example.com/Thing">', ['http://example.com/Thing']);
-  t('<meta itemtype="http://example.com/Thing com.example.Thing">', ['http://example.com/Thing', 'com.example.Thing']);
-  t('<meta itemtype="com.example.Thing http://example.com/Thing">', ['com.example.Thing', 'http://example.com/Thing']);
-  t('<meta itemtype="http://example.com/Thing http://example.com/Thing">', ['http://example.com/Thing', 'http://example.com/Thing']);
-  t('<meta itemtype="http://example.com/Thing com.example.Thing http://example.com/Thing">', ['http://example.com/Thing', 'com.example.Thing', 'http://example.com/Thing']);
+  testTokenListReflection('div', 'itemtype', 'itemType');
 });
 
 test('jQuery.fn.itemId', function() {
@@ -93,27 +105,11 @@ test('jQuery.fn.itemId', function() {
 });
 
 test('jQuery.fn.itemProp', function() {
-  function t(html, expected) {
-    same($(html).itemProp().toArray(), expected);
-  }
-  t('<meta>', []);
-  t('<meta itemprop="do">', ['do']);
-  t('<meta itemprop="do re">', ['do', 're']);
-  t('<meta itemprop="re do">', ['re', 'do']);
-  t('<meta itemprop="do do">', ['do', 'do']);
-  t('<meta itemprop="do re do">', ['do', 're', 'do']);
+  testTokenListReflection('div', 'itemprop', 'itemProp');
 });
 
 test('jQuery.fn.itemRef', function() {
-  function t(html, expected) {
-    same($(html).itemRef().toArray(), expected);
-  }
-  t('<meta>', []);
-  t('<meta itemref="do">', ['do']);
-  t('<meta itemref="do re">', ['do', 're']);
-  t('<meta itemref="re do">', ['re', 'do']);
-  t('<meta itemref="do do">', ['do', 'do']);
-  t('<meta itemref="do re do">', ['do', 're', 'do']);
+  testTokenListReflection('div', 'itemref', 'itemRef');
 });
 
 module('jQuery.fn.itemValue');
