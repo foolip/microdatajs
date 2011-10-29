@@ -8,9 +8,9 @@ test('jQuery.fn.items', function() {
     if (types)
       msg += "'"+types+"'";
     msg += ')';
-    same($(context).items(types).toArray(),
-         $.map(expected, function(id) { return document.getElementById(id); }),
-         msg);
+    deepEqual($(context).items(types).toArray(),
+              $.map(expected, function(id) { return document.getElementById(id); }),
+              msg);
   }
   t(document, undefined, ['w', 'x', 'dupref', 'loops', 'ioItem', 'dupprops', 'noprops']);
   t('#x', undefined, []);
@@ -22,9 +22,9 @@ test('jQuery.fn.items', function() {
 
 test('jQuery.fn.properties', function() {
   function t(selector, name, expected) {
-    same($(selector).properties(name).toArray(),
-         $.map(expected, function(id) { return document.getElementById(id); }),
-         selector);
+    deepEqual($(selector).properties(name).toArray(),
+              $.map(expected, function(id) { return document.getElementById(id); }),
+              selector);
   }
   t('#testdata', undefined, []);
   t('#w', undefined, ['w0', 'w1', 'w2', 'w3']);
@@ -54,7 +54,7 @@ function testTokenListReflection(elm, attr, func) {
     var attrVal = tokens.join(' \t\n\f\r');
     $elm.attr(attr, attrVal);
     var list = $elm[func]();
-    same($(list).toArray(), tokens);
+    deepEqual($(list).toArray(), tokens);
     $.each(tokens, function(i, token) {
       ok(list.contains(token));
     });
@@ -78,20 +78,20 @@ function testStringReflection($elm, attr, func, attrString, funcString) {
   if (typeof $elm == 'string')
     $elm = $(document.createElement($elm));
 
-  equals($elm[func](), '', 'get empty string');
+  equal($elm[func](), '', 'get empty string');
   $elm.attr(attr, attrString);
-  equals($elm[func](), funcString, 'get reflected string');
+  equal($elm[func](), funcString, 'get reflected string');
   $elm.removeAttr(attr);
-  equals($elm[func](), '', 'get empty string');
+  equal($elm[func](), '', 'get empty string');
 }
 
 test('jQuery.fn.itemScope', function() {
   var $elm = $(document.createElement('div'));
-  equals($elm.itemScope(), false);
+  equal($elm.itemScope(), false);
   $elm.attr('itemscope', '');
-  equals($elm.itemScope(), true);
+  equal($elm.itemScope(), true);
   $elm[0].removeAttribute('itemscope');
-  equals($elm.itemScope(), false);
+  equal($elm.itemScope(), false);
 });
 
 test('jQuery.fn.itemType', function() {
@@ -115,12 +115,12 @@ test('jQuery.fn.itemRef', function() {
 module('jQuery.fn.itemValue');
 
 test('no @itemprop', function() {
-  equals($('<div></div>').itemValue(), null);
+  equal($('<div></div>').itemValue(), null);
 });
 
 test('@itemscope', function() {
   var $elm = $('<div itemprop itemscope></div>');
-  equals($elm.itemValue(), $elm[0], '@itemscope');
+  equal($elm.itemValue(), $elm[0], '@itemscope');
 });
 
 test('meta', function() {
@@ -172,7 +172,7 @@ test('object', function() {
 });
 
 test('time', function() {
-  equals($('<time></time>').itemValue(), undefined);
-  equals($('<time itemprop>now</time>').itemValue(), 'now');
-  equals($('<time itemprop datetime="1984-09-03">then</time>').itemValue(), '1984-09-03');
+  equal($('<time></time>').itemValue(), undefined);
+  equal($('<time itemprop>now</time>').itemValue(), 'now');
+  equal($('<time itemprop datetime="1984-09-03">then</time>').itemValue(), '1984-09-03');
 });
