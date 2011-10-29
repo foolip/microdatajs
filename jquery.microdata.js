@@ -149,10 +149,8 @@
       return resolve(elm, 'href');
     case 'OBJECT':
       return resolve(elm, 'data');
-    case 'TIME':
-      var datetime = elm.getAttribute('datetime');
-      if (datetime != null)
-        return datetime;
+    case 'DATA':
+      return this.attr('value') || '';
     default:
       return this.text();
     }
@@ -210,7 +208,7 @@
   }
 
   // feature detection to use native support where available
-  var t = $('<div itemscope itemtype="type" itemid="id" itemprop="prop" itemref="ref">')[0];
+  var t = $('<data itemscope itemtype="type" itemid="id" itemprop="prop" itemref="ref" value="value">')[0];
 
   $.fn.extend({
     items: document.getItems && t.itemType && t.itemType.contains ? function(types) {
@@ -227,7 +225,7 @@
     itemType: t.itemType && t.itemType.contains ? function() {
       return this[0].itemType;
     } : tokenList('itemtype'),
-    itemId: t.itemId ? function() {
+    itemId: t.itemId == "id" ? function() {
       return this[0].itemId;
     } : function () {
       return resolve(this[0], 'itemid');
@@ -238,7 +236,7 @@
     itemRef: t.itemRef && t.itemRef.contains ? function() {
       return this[0].itemRef;
     } : tokenList('itemref'),
-    itemValue: t.itemValue ? function() {
+    itemValue: t.itemValue == "value" ? function() {
       return this[0].itemValue;
     } : itemValue,
     properties: t.properties && t.properties.namedItem ? function(name) {

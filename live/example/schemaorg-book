@@ -19,7 +19,7 @@ by <a itemprop="author" href="/author/jd_salinger.html">J.D. Salinger</a>
 Product details
 <span itemprop="numPages">224</span> pages
 Publisher: <span itemprop="publisher">Little, Brown, and Company</span> -
- <time itemprop="publishDate" datetime="1991-05-01">May 1, 1991</time>
+ <data itemprop="datePublished" value="1991-05-01">May 1, 1991</data>
 Language: <span itemprop="inLanguage">English</span>
 ISBN-10: <span itemprop="isbn">0316769487</span>
 
@@ -29,7 +29,7 @@ Reviews:
   <span itemprop="reviewRating">5</span> stars -
   <b>"<span itemprop="name">A masterpiece of literature</span>" </b>
   by <span itemprop="author">John Doe</span>,
-  Written on <time itemprop="publishDate" datetime="2006-05-04">May 4, 2006</time>
+  Written on <data itemprop="datePublished" value="2006-05-04">May 4, 2006</data>
   <span itemprop="reviewBody">I really enjoyed this book. It captures the essential
   challenge people face as they try make sense of their lives and grow to adulthood.</span>
 </div>
@@ -38,7 +38,7 @@ Reviews:
   <span itemprop="reviewRating">4</span> stars -
   <b>"<span itemprop="name">A good read.</span>" </b>
   by <span itemprop="author">Bob Smith</span>,
-  Written on <time itemprop="publishDate" datetime="2006-06-15">June 15, 2006</time>
+  Written on <data itemprop="datePublished" value="2006-06-15">June 15, 2006</data>
   <span itemprop="reviewBody">Catcher in the Rye is a fun book. It's a good book to read.</span>
 </div>
 
