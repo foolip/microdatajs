@@ -71,12 +71,9 @@
   }
 
   function getItems(types) {
-    var doc = this[0];
-    if (doc.getItems)
-      return $(types ? doc.getItems(types) : doc.getItems());
     var selector = $.map(splitTokens(types), function(t) {
       return '[itemtype~="'+t.replace(/"/g, '\\"')+'"]';
-    }).join(',') || '*';
+    }).join('') || '*';
     // filter results to only match top-level items.
     // because [attr] selector doesn't work in IE we have to
     // filter the elements. http://dev.jquery.com/ticket/5637
@@ -212,7 +209,12 @@
   var t = $('<div itemscope itemtype="type" itemid="id" itemprop="prop" itemref="ref">')[0];
 
   $.fn.extend({
-    items: getItems,
+    items: document.getItems && t.itemType && t.itemType.contains ? function(types) {
+      var doc = this[0];
+      if (doc.getItems)
+        return $(types ? doc.getItems(types) : doc.getItems());
+      return getItems.call(this, types);
+    } : getItems,
     itemScope: t.itemScope ? function() {
       return this[0].itemScope;
     } : function () {

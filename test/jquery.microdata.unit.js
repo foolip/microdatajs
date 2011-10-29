@@ -16,6 +16,7 @@ test('jQuery.fn.items', function() {
   t('#x', undefined, []);
   t('#io', undefined, ['ioItem']);
   t(document, 'http://n.whatwg.org/work', ['w', 'x']);
+  t(document, 'http://n.foolip.org/work http://n.whatwg.org/work', ['x']);
   t(document, 'bogus', []);
 });
 
