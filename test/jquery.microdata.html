@@ -6,7 +6,9 @@
 <script src="qunit/qunit/qunit.js"></script>
 <link rel="stylesheet" href="qunit/qunit/qunit.css">
 <script src="../lib/jquery-1.6.4.min.js"></script>
+<script src="../lib/json2.js"></script>
 <script src="../jquery.microdata.js"></script>
+<script src="../jquery.microdata.json.js"></script>
 <style>#testdata{display:none;}</style>
 </head>
 <body>
@@ -30,20 +32,18 @@
     <div id="dupref" itemscope itemref="w1 w1"></div>
 
     <div id="loops" itemscope>
-      <div id="plain" itemprop="text">plain property</div>
       <div id="loop0" itemprop="self" itemscope itemref="loop0"></div>
       <div id="loop1" itemprop="head" itemscope itemref="loop2">not in the loop</div>
-      <div id="loop2" itemprop="next" itemscope itemref="loop3"></div>
-      <div id="loop3" itemprop="next" itemscope itemref="loop4"></div>
-      <div id="loop4" itemprop="next" itemscope itemref="loop2"></div>
+      <div id="loop2" itemprop="first" itemscope itemref="loop3"></div>
+      <div id="loop3" itemprop="last" itemscope itemref="loop2"></div>
     </div>
 
     <div id="io"> <!-- inside-out -->
-      <div id="ioBefore" itemprop="oddstuff">included via parent</div>
+      <div id="ioBefore" itemprop="oddstuff">via parent</div>
       <div id="ioItem" itemscope itemref="io">
-	<div id="ioChild" itemprop="oddstuff">included via tree</div>
+	<div id="ioChild" itemprop="oddstuff">via tree</div>
       </div>
-      <div id="ioAfter" itemprop="oddstuff">included via parent</div>
+      <div id="ioAfter" itemprop="oddstuff">via parent</div>
     </div>
   </div>
 

@@ -34,12 +34,11 @@ test('jQuery.fn.properties', function() {
   t('#x', 'work', ['x0']);
   t('#x', 'author', ['w2']);
   t('#dupref', undefined, ['w1']);
-  t('#loops', undefined, ['plain', 'loop0','loop1', 'loop2', 'loop3', 'loop4']);
+  t('#loops', undefined, ['loop0','loop1', 'loop2', 'loop3']);
   t('#loop0', undefined, []);
   t('#loop1', undefined, ['loop2']);
   t('#loop2', undefined, ['loop3']);
-  t('#loop3', undefined, ['loop4']);
-  t('#loop4', undefined, ['loop2']);
+  t('#loop3', undefined, ['loop2']);
   t('#ioItem', undefined, ['ioBefore', 'ioChild', 'ioAfter']);
   t('#dupprops', undefined, ['foo0', 'bar0', 'bar1', 'foo1']);
   t('#dupprops', 'foo', ['foo0', 'foo1']);
@@ -175,4 +174,57 @@ test('time', function() {
   equal($('<time></time>').itemValue(), undefined);
   equal($('<time itemprop>now</time>').itemValue(), 'now');
   equal($('<time itemprop datetime="1984-09-03">then</time>').itemValue(), '1984-09-03');
+});
+
+module('jQuery.microdata.json');
+
+test('JSON extraction', function() {
+  var json = $.microdata.json();
+  deepEqual(JSON.parse(json), { items: [
+    {
+      type: ['http://n.whatwg.org/work'],
+      properties: {
+        work: ['http://foolip.org/microdatajs/'],
+        title: ['MicrodataJS'],
+        author: ['Philip Jägenstedt'],
+        license: ['http://creativecommons.org/licenses/by/3.0/']
+      }
+    },
+    {
+      type: ['http://n.whatwg.org/work', 'http://n.foolip.org/work'],
+      properties: {
+        author: ['Philip Jägenstedt'],
+        license: ['http://creativecommons.org/licenses/by/3.0/'],
+        work: ['http://blog.foolip.org/'],
+        title: ['Pretentious Nonsense']
+      }
+    },
+    {
+      properties: {
+        title: ['MicrodataJS']
+      }
+    },
+    {
+      properties: {
+        self: [ { properties: {} } ],
+        head: [ { properties: { first: [ { properties: { last: [ { properties: { first: ['ERROR'] } } ] } } ] } } ],
+        first: [ { properties: { last: [ { properties: { first: ['ERROR'] } } ] } } ],
+        last: [ { properties: { first: [ { properties: { last: ['ERROR'] } } ] } } ]
+      }
+    },
+    {
+      properties: {
+        oddstuff: ['via parent', 'via tree', 'via parent']
+      }
+    },
+    {
+      properties: {
+        foo: ['', ''],
+        bar: ['', '']
+      }
+    },
+    {
+      properties: {}
+    }
+  ]});
 });
