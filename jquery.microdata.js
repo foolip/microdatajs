@@ -236,7 +236,7 @@
     itemRef: t.itemRef && t.itemRef.contains ? function() {
       return this[0].itemRef;
     } : tokenList('itemref'),
-    itemValue: t.itemValue == "value" ? function() {
+    itemValue: t.itemValue == t && t.value == "value" ? function() {
       return this[0].itemValue;
     } : itemValue,
     properties: t.properties && t.properties.namedItem ? function(name) {
