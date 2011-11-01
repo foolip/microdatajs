@@ -55,9 +55,9 @@ jQuery.microdata.ical = function(selector) {
         if ($elem.get(0).tagName.toUpperCase() == 'TIME') {
           var value = $elem.itemValue().replace(/[-:]/g, '');
           if ($.microdata.isValidDateString($elem.itemValue())) {
-            addLine(name, value, "VALUE=DATE");
+            addLine(name, value, 'VALUE=DATE');
           } else if ($.microdata.isValidGlobalDateAndTimeString($elem.itemValue())) {
-            addLine(name, value, "VALUE=DATE-TIME");
+            addLine(name, value, 'VALUE=DATE-TIME');
           }
         } else {
           addLine(name, $elem.itemValue());

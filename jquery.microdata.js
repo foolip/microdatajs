@@ -225,7 +225,7 @@
     itemType: t.itemType && t.itemType.contains ? function() {
       return this[0].itemType;
     } : tokenList('itemtype'),
-    itemId: t.itemId == "id" ? function() {
+    itemId: t.itemId == 'id' ? function() {
       return this[0].itemId;
     } : function () {
       return resolve(this[0], 'itemid');
@@ -236,7 +236,7 @@
     itemRef: t.itemRef && t.itemRef.contains ? function() {
       return this[0].itemRef;
     } : tokenList('itemref'),
-    itemValue: t.itemValue == t && t.value == "value" ? function() {
+    itemValue: t.itemValue == t && t.value == 'value' ? function() {
       return this[0].itemValue;
     } : itemValue,
     properties: t.properties && t.properties.namedItem ? function(name) {
