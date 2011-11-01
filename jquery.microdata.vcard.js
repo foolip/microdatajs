@@ -1,5 +1,7 @@
 /* -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 
+'use strict';
+
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#conversion-to-vcard
 jQuery.microdata.vcard = function(selector) {
   var $ = jQuery;
@@ -53,25 +55,25 @@ jQuery.microdata.vcard = function(selector) {
         function addParam(n, v) {
           params.push({name:n,value:v});
         }
+        function addTypeParam() {
+          var $type = $subitem.properties('type').first();
+          if ($type.length > 0 && !$type.itemScope() &&
+              /^[0-9A-Za-z]*$/.test($type.itemValue()))
+            addParam('TYPE', $type.itemValue());
+        }
+        function escapeProps(name) {
+          return $subitem.properties(name)
+            .filter(function(){return !$(this).itemScope();})
+            .map(function(){return escapeString($(this).itemValue());})
+            .toArray().join(',');
+        }
+        function escapeFirstProp(name) {
+          var $first = $subitem.properties(name).first();
+          return ($first.length > 0 && !$first.itemScope()) ? escapeString($first.itemValue()) : '';
+        }
+
         if ($prop.itemScope()) {
           var $subitem = $prop;
-          function addTypeParam() {
-            var $type = $subitem.properties('type').first();
-            if ($type.length > 0 && !$type.itemScope() &&
-                /^[0-9A-Za-z]*$/.test($type.itemValue()))
-              addParam('TYPE', $type.itemValue());
-          }
-          function escapeProps(name) {
-            return $subitem.properties(name)
-              .filter(function(){return !$(this).itemScope();})
-              .map(function(){return escapeString($(this).itemValue());})
-              .toArray().join(',');
-          }
-          function escapeFirstProp(name) {
-            var $first = $subitem.properties(name).first();
-            return ($first.length > 0 && !$first.itemScope()) ? escapeString($first.itemValue()) : '';
-          }
-
           if (name == 'n') {
             value = escapeFirstProp('family-name')+';'+
               escapeFirstProp('given-name')+';'+

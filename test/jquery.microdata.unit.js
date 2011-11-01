@@ -1,5 +1,7 @@
 /* -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 
+'use strict';
+
 test('jQuery.fn.items', function() {
   function t(context, types, expected) {
     var msg = '$(';

@@ -1,5 +1,7 @@
 /* -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 
+'use strict';
+
 function update(iframe, html) {
   // update preview
   var doc = iframe.contentWindow.document;

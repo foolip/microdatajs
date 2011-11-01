@@ -1,5 +1,7 @@
 /* -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 
+'use strict';
+
 (function(){
   var $ = jQuery;
 
