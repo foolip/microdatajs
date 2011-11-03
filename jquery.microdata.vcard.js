@@ -44,8 +44,6 @@ jQuery.microdata.vcard = function(selector) {
     var $title = $('title').first();
     if ($title.length > 0)
       addLine('NAME', [], escapeString($title.text()));
-    if ($vcard.itemId())
-      addLine('UID', [], escapeString($vcard.itemId()));
     $vcard.properties().each(function() {
       var $prop = $(this);
       $.each($prop.itemProp(), function() {
