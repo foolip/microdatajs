@@ -35,7 +35,7 @@ function pre(text) {
 }
 
 function downloadIt(mime, data) {
-  return $('<a class="download" href="data:'+mime+';charset=UTF-8,'+encodeURI(data)+'">Download it!</a>');
+  return $('<a class="download" href="data:'+mime+';charset=UTF-8,'+encodeURIComponent(data)+'">Download it!</a>');
 }
 
 function updateTab(iframe, index) {
