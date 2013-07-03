@@ -153,6 +153,10 @@
       return resolve(elm, 'data');
     case 'DATA':
       return this.attr('value') || '';
+    case 'TIME':
+      var datetime = elm.getAttribute('datetime');
+      if (datetime != null)
+        return datetime;
     default:
       return this.text();
     }

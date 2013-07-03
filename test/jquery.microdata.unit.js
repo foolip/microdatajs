@@ -176,6 +176,12 @@ test('data', function() {
   testStringReflection($('<data itemprop></data>'), 'value', 'itemValue', 'foo');
 });
 
+test('time', function() {
+  equal($('<time></time>').itemValue(), undefined);
+  equal($('<time itemprop>now</time>').itemValue(), 'now');
+  equal($('<time itemprop datetime="1984-09-03">then</time>').itemValue(), '1984-09-03');
+});
+
 module('jQuery.microdata.json');
 
 test('JSON extraction', function() {

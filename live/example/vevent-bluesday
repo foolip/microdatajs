@@ -2,8 +2,8 @@
  ...
  <h1 itemprop="summary">Bluesday Tuesday: Money Road</h1>
  ...
- <data itemprop="dtstart" value="2009-05-05T19:00:00Z">May 5th @ 7pm</data>
- (until <data itemprop="dtend" value="2009-05-05T21:00:00Z">9pm</data>)
+ <time itemprop="dtstart" datetime="2009-05-05T19:00:00Z">May 5th @ 7pm</time>
+ (until <time itemprop="dtend" datetime="2009-05-05T21:00:00Z">9pm</time>)
  ...
  <a href="http://livebrum.co.uk/2009/05/05/bluesday-tuesday-money-road"
     rel="bookmark" itemprop="url">Link to this page</a>

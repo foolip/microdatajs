@@ -11,7 +11,7 @@ function update(iframe, html) {
   $.each(['section', 'article', 'aside', 'data', 'hgroup', 'header', 'footer',
           'nav', 'figure', 'figcaption', 'video', 'audio', 'mark', 'progress',
           'meter', 'ruby', 'rt', 'rp', 'bdi', 'canvas', 'details', 'datalist',
-          'output'],
+          'output', 'time'],
          function(i, tagName) { doc.createElement(tagName); });
   // shrink iframe to max(150, height) (replace with <iframe seamless>?)
   $(iframe.contentWindow).load(function() {
