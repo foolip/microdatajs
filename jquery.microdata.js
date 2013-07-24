@@ -213,40 +213,18 @@
     return $(props);
   }
 
-  // feature detection to use native support where available
-  var t = $('<data itemscope itemtype="type" itemid="id" itemprop="prop" itemref="ref" value="value">')[0];
-
   $.fn.extend({
-    items: document.getItems && t.itemType && t.itemType.contains ? function(types) {
-      var doc = this[0];
-      if (doc.getItems)
-        return $(types ? doc.getItems(types) : doc.getItems());
-      return getItems.call(this, types);
-    } : getItems,
-    itemScope: t.itemScope ? function() {
-      return this[0].itemScope;
-    } : function () {
+    items: getItems,
+    itemScope: function () {
       return this[0].getAttribute('itemscope') != null;
     },
-    itemType: t.itemType && t.itemType.contains ? function() {
-      return this[0].itemType;
-    } : tokenList('itemtype'),
-    itemId: t.itemId == 'id' ? function() {
-      return this[0].itemId;
-    } : function () {
+    itemType: tokenList('itemtype'),
+    itemId: function () {
       return resolve(this[0], 'itemid');
     },
-    itemProp: t.itemProp && t.itemProp.contains ? function() {
-      return this[0].itemProp;
-    } : tokenList('itemprop'),
-    itemRef: t.itemRef && t.itemRef.contains ? function() {
-      return this[0].itemRef;
-    } : tokenList('itemref'),
-    itemValue: t.itemValue == t && t.value == 'value' ? function() {
-      return this[0].itemValue;
-    } : itemValue,
-    properties: t.properties && t.properties.namedItem ? function(name) {
-      return $(name ? this[0].properties.namedItem(name) : this[0].properties);
-    } : properties
+    itemProp: tokenList('itemprop'),
+    itemRef: tokenList('itemref'),
+    itemValue: itemValue,
+    properties: properties
   });
 })();
