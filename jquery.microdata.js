@@ -214,7 +214,7 @@
   }
 
   // feature detection to use native support where available
-  var t = $('<data itemscope itemtype="type" itemid="id" itemprop="prop" itemref="ref" value="value">')[0];
+  var t = $('<data itemscope itemtype="type" itemid="id" itemprop="prop" itemref="ref" value="value">');
 
   $.fn.extend({
     items: document.getItems && t.itemType && t.itemType.contains ? function(types) {
