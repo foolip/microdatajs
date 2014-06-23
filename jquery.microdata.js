@@ -94,22 +94,29 @@
 
   function resolve(elm, attr) {
     // in order to handle <base> and attributes which aren't properly
-    // reflected as URLs, insert a temporary <img> element just before
-    // elm and resolve using its src attribute. the <img> element must
+    // reflected as URLs, insert a temporary <a> element just before
+    // elm and resolve using its href property. the <a> element must
     // be created using the parent document due IE security policy.
     var url = elm.getAttribute(attr);
     if (!url)
       return '';
     var a = ancestor(elm);
     var p = elm.parentNode;
-    var img = (a.createElement ? a : document).createElement('img');
+    var div = (a.createElement ? a : document).createElement('div');
     try {
-      img.setAttribute('src', url);
+      // Setting the href attribute/property on an <a> element
+      // directly doesn't trigger resolution against the base URL in
+      // IE, but creating an <a> element with innerHTML does. We have
+      // to do some acrobatics to avoid having to HTML-escape the URL.
+      // See http://stackoverflow.com/a/22918332/250798
+      div.innerHTML = '<a></a>';
+      div.firstChild.href = url;
+      div.innerHTML = div.innerHTML;
       if (p)
-        p.insertBefore(img, elm);
-      url = img.src;
+        p.insertBefore(div, elm);
+      url = div.firstChild.href;
       if (p)
-        p.removeChild(img);
+        p.removeChild(div);
     } catch (e) {
       // IE>6 throws "TypeError: Access is denied." for mailto:
       // URLs. This is annoying, but harmless to ignore.
