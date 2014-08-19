@@ -80,7 +80,7 @@
     // because [attr] selector doesn't work in IE we have to
     // filter the elements. http://dev.jquery.com/ticket/5637
     return $(selector, this).filter(function() {
-      return (this.getAttribute('itemscope') != null &&
+      return (this.hasAttribute('itemscope')  &&
               this.getAttribute('itemprop') == null);
     });
   }
@@ -223,7 +223,7 @@
   $.fn.extend({
     items: getItems,
     itemScope: function () {
-      return this[0].getAttribute('itemscope') != null;
+      return this[0].hasAttribute('itemscope');
     },
     itemType: tokenList('itemtype'),
     itemId: function () {
