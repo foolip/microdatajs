@@ -34,8 +34,8 @@ function pre(text) {
   return $('<pre>'+text.replace(/&/g, '&amp;').replace(/</g, '&lt;')+'</pre>');
 }
 
-function downloadIt(mime, data) {
-  return $('<a class="download" href="data:'+mime+';charset=UTF-8,'+encodeURIComponent(data)+'">Download it!</a>');
+function downloadIt(filename, mime, data) {
+  return $('<a download="'+filename+'" href="data:'+mime+';charset=UTF-8,'+encodeURIComponent(data)+'">Download it!</a>');
 }
 
 function updateTab(iframe, index) {
@@ -47,7 +47,7 @@ function updateTab(iframe, index) {
       update: function($tab, $items) {
         var jsonText = $.microdata.json($items, function(o) { return JSON.stringify(o, undefined, 2); });
         $tab.append(pre(jsonText));
-        $tab.append(downloadIt('application/json', jsonText));
+        $tab.append(downloadIt('microdata.json', 'application/json', jsonText));
       }
     },
     {
@@ -61,7 +61,7 @@ function updateTab(iframe, index) {
           if (i > 0)
             $tab.append(document.createElement('hr'));
           $tab.append(pre(vcardText));
-          $tab.append(downloadIt('text/directory;profile=vCard', vcardText));
+          $tab.append(downloadIt('microdata.vcard', 'text/directory;profile=vCard', vcardText));
         });
       }
     },
@@ -76,7 +76,7 @@ function updateTab(iframe, index) {
           if (i > 0)
             $tab.append(document.createElement('hr'));
           $tab.append(pre(icalText));
-          $tab.append(downloadIt('text/calendar;componenet=vevent', icalText));
+          $tab.append(downloadIt('microdata.ical', 'text/calendar;componenet=vevent', icalText));
         });
       }
     }

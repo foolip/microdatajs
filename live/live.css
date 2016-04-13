@@ -92,7 +92,7 @@ hr {
   background-color: #666;
   margin: 2em;
 }
-.download {
+a[download] {
   font-weight: bold;
 }
 footer {
