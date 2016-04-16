@@ -1,9 +1,9 @@
 /* -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 
-'use strict';
-
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#conversion-to-icalendar
 jQuery.microdata.ical = function(selector) {
+  'use strict';
+
   var $ = jQuery;
 
   var veventURI = 'http://microformats.org/profile/hcalendar#vevent';

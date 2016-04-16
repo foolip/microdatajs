@@ -1,9 +1,9 @@
 /* -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*- */
 
-'use strict';
-
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/microdata.html#json
 jQuery.microdata.json = function(selector, format) {
+  'use strict';
+
   var $ = jQuery;
 
   function getObject(item, memory) {
